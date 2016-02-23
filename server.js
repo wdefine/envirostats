@@ -16,18 +16,16 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
 	socket.on('join', function(room, name, callback){
-		socket.join(room);
+		
 	});
 	socket.on('disconnect', function(){
 	});
 
 	// These functions can be socket or post/get 
-	socket.on('newdata', function(data){
-		conn.query('INSERT INTO ??????? (data) VALUES($1)',[data])
+	socket.on('newdata', function(identifier, column, value){
+		conn.query('UPDATE stats SET ($2)=($3) WHERE ident=($1)', [identifier, column, value])
 		.on("end", function() {
 		});
-	});
-	socket.on('editdata', function(name){
 	});
 	socket.on('getdata', function(name){
 	});
@@ -36,10 +34,6 @@ io.on('connection', function(socket) {
 
 app.get('/', function(request, response){//keep this old code
 	response.render('index.html', {rooms: roomlist});
-});
-
-app.post('/',function(request, response){//keep this old code
-
 });
 
 app.get('/:room', function(request, response){
