@@ -23,11 +23,24 @@ io.on('connection', function(socket) {
 		});
 	});
 	socket.on('newentries', function(date, river, number)){
-		for(var i=0; i<number; i++){	
-			conn.query('INSERT INTO stats (date, river, site_number) VALUES($1,$2,$3,$4)',[date, river, i])
+		var x =0;
+		conn.query('SELECT river, date FROM visits')
+			.on('data', function(row){
+				if(row.river == river && row.date == date){
+					x=1;
+				}
+			})
+			.on('end', function(){
+				if(x==0){
+					for(var i=0; i<number; i++){	
+						conn.query('INSERT INTO stats (date, river, site_number) VALUES($1,$2,$3,$4)',[date, river, i]);
+					}
+					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
+					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
+					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
+					sockets.emit('updateentries', river, date);
+				}	
 			});
-		}
-		sockets.emit('updateentries', date, river);
 	socket.on('getdata', function(name){
 	});
 });
