@@ -15,17 +15,14 @@ app.use(express.static(__dirname + '/public'));
 
 
 io.on('connection', function(socket) {
-	socket.on('join', function(){
-	});
-	socket.on('disconnect', function(){
-	});
-
 	// These functions can be socket or post/get 
 	socket.on('newdata', function(identifier, column, value){
 		conn.query('UPDATE stats SET ($2)=($3) WHERE ident=($1)', [identifier, column, value])
 		.on("end", function() {
+			sockets.emit('updatedata', identifier, column, value);
 		});
 	});
+
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
 		var data = [];
 		//date and river |river | date | all rivers since a certain date | all
@@ -58,30 +55,64 @@ io.on('connection', function(socket) {
 				return data;
 			});
 		}
+	socket.on('newentries', function(date, river, number)){
+		var x =0;
+		conn.query('SELECT river, date FROM visits')
+			.on('data', function(row){
+				if(row.river == river && row.date == date){
+					x=1;
+				}
+			})
+			.on('end', function(){
+				if(x==0){
+					for(var i=0; i<number; i++){	
+						conn.query('INSERT INTO stats (date, river, site_number) VALUES($1,$2,$3,$4)',[date, river, i]);
+					}
+					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
+					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
+					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
+					sockets.emit('updateentries', river, date);
+				}	
+			});
+
 	});
 });
 
 
-app.get('/', function(request, response){//keep this old code
-	response.render('index.html', {rooms: roomlist});
+app.get('/', function(request, response){
+	var recent=0;
+	conn.query('SELECT date FROM stats')
+	.on('data', function(row){
+		if(row.date >recent){
+			recent = row.date;
+		}
+	})
+	.on('end', function(){
+		var data = [];
+		conn.query('SELECT * FROM stats WHERE date >= ($1)'[recent])
+		.on('data', function(row){
+			data.push(row);
+		})		
+		.on('end', function(){
+			var rivers = [];
+			conn.query('SELECT * FROM rivers')
+			.on('data', function(row){
+				rivers.push(row);
+			})
+			.on('end', function(){
+				var dates = [];
+				conn.query('SELECT * FROM dates')
+				.on('data', function(row){
+					dates.push(row);
+				})
+				.on('end', function(){
+					response.render('index.html', {data: data, rivers: rivers, dates: dates});
+				});
+			});
+		});
+	});
 });
 
-app.get('/:room', function(request, response){
-	var room = request.params.room;
-	response.render('room.html', {roomName: room});
-});
+
 
 server.listen(8080)
-
-
-function getTime(){//this is a string
-	var currentTime = new Date()
-	var hours = currentTime.getHours().toString();
-	var minutes = currentTime.getMinutes().toString();
-	var seconds = currentTime.getSeconds().toString();
-	if (minutes < 10)
-		minutes = "0" + minutes;
-	if (seconds < 10)
-		seconds = "0" + seconds;
-	return hours + ":" + minutes + ":" + seconds;
-}
