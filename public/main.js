@@ -16,3 +16,13 @@ window.addEventListener('load', function() {
 	});
 
  }, false );
+
+function new_event(){
+	date = new Date(year, month, day, 0, 0, 0);
+	socket.emit('newentries', date, river, number)
+}
+function update_data(){
+	name = document.getElementById('????????').value;
+	// find a way to extract row(int) and column(string)
+	socket.emit('newdata', row, column, value)
+}
