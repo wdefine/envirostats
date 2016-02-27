@@ -22,6 +22,39 @@ io.on('connection', function(socket) {
 			sockets.emit('updatedata', identifier, column, value);
 		});
 	});
+
+	socket.on('getdata', function(date, river, since){ //needs river, date, 
+		var data = [];
+		//date and river |river | date | all rivers since a certain date | all
+		if(date == null && river == null && since == null){ //return all
+			var a = conn.query('SELECT * FROM stats');
+			socket.emit('returnData', getSpecData(a));
+		}
+		else if(date != null && river == null && since == null){ //return from date
+			var b = conn.query('SELECT * FROM stats WHERE date = $1', [date]);
+			socket.emit('returnData', getSpecData(b));
+		}
+		else if(date == null && river != null && since == null){ //return from river
+			var c = conn.query('SELECT * FROM stats WHERE river = $1', [river]);
+			socket.emit('returnData', getSpecData(c));
+		}
+		else if(date != null && river != null && since == null){ //return from both river and date
+			var d = conn.query('SELECT * FROM stats WHERE river = $1 AND date = $2', [river, date]);
+			socket.emit('returnData', getSpecData(d));
+		}
+		else if(date != null && river == null && since != null){ //return everything since a certain date
+        	var e = conn.query('SELECT * FROM stats WHERE date >= ($1)'[recent]);
+			socket.emit('returnData', getSpecData(e));
+		}
+		
+		function getSpecData(db){
+			db.on('data', function (row){
+				data.push(row);
+			});
+			db.on('end', function{
+				return data;
+			});
+		}
 	socket.on('newentries', function(date, river, number)){
 		var x =0;
 		conn.query('SELECT river, date FROM visits')
@@ -41,7 +74,7 @@ io.on('connection', function(socket) {
 					sockets.emit('updateentries', river, date);
 				}	
 			});
-	socket.on('getdata', function(name){
+
 	});
 });
 
@@ -83,16 +116,3 @@ app.get('/', function(request, response){
 
 
 server.listen(8080)
-
-
-function getTime(){//this is a string
-	var currentTime = new Date()
-	var hours = currentTime.getHours().toString();
-	var minutes = currentTime.getMinutes().toString();
-	var seconds = currentTime.getSeconds().toString();
-	if (minutes < 10)
-		minutes = "0" + minutes;
-	if (seconds < 10)
-		seconds = "0" + seconds;
-	return hours + ":" + minutes + ":" + seconds;
-}
