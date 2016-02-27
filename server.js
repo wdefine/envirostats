@@ -71,9 +71,14 @@ io.on('connection', function(socket) {
 					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
-					sockets.emit('updateentries', river, date);
 					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, data]);
 					sockets.emit('returnData', getSpecData(special));
+					if(row.river != river){
+						sockets.emit('updateRiver', river);
+					}
+					if(row.date != date){
+						sockets.emit('updateDate', date);
+					}
 				}	
 			});
 
