@@ -6,15 +6,15 @@ conn.query('CREATE  TABLE stats ("ident" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT
 	.on('end', function(){
 		console.log('Made table!');
 	});
-conn.query('CREATE TABLE rivers ("river" TEXT NOT NULL)')
+conn.query('CREATE TABLE rivers ("river" TEXT)')
 	.on('end', function(){
 		console.log('Made table!');
 	});
-conn.query('CREATE TABLE dates ("date" TEXT NOT NULL)')
+conn.query('CREATE TABLE dates ("date" INTEGER)')
 	.on('end', function(){
 		console.log('Made table!');
 	});
-conn.query('CREATE TABLE visits ("river" TEXT NOT NULL, "date" INTEGER NOT NULL)')
+conn.query('CREATE TABLE visits ("river" TEXT, "date" INTEGER)')
 	.on('end', function(){
 		console.log('Made table!');
 	});
