@@ -78,6 +78,7 @@ io.on('connection', function(socket) {
 
 app.get('/', function(request, response){
 	response.render('index.html');
+	
 });
 app.get('/submit', function(request, response){
 	var recent=0;
