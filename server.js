@@ -22,39 +22,29 @@ io.on('connection', function(socket) {
 			sockets.emit('updatedata', identifier, column, value);
 		});
 	});
-
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
 		//date and river |river | date | all rivers since a certain date | all
-		if(date == null && river == null && since == null){ //return all
+		if(date == 0 && river == 0 && since == 0){ //return all
 			var a = conn.query('SELECT * FROM stats');
 			socket.emit('returnData', getSpecData(a));
 		}
-		else if(date != null && river == null && since == null){ //return from date
+		else if(date != 0 && river == 0 && since == 0){ //return from date
 			var b = conn.query('SELECT * FROM stats WHERE date = ($1)', [date]);
 			socket.emit('returnData', getSpecData(b));
 		}
-		else if(date == null && river != null && since == null){ //return from river
+		else if(date == 0 && river != 0 && since == 0){ //return from river
 			var c = conn.query('SELECT * FROM stats WHERE river = ($1)', [river]);
 			socket.emit('returnData', getSpecData(c));
 		}
-		else if(date != null && river != null && since == null){ //return from both river and date
+		else if(date != 0 && river != 0 && since == 0){ //return from both river and date
 			var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 			socket.emit('returnData', getSpecData(d));
 		}
-		else if(date != null && river == null && since != null){ //return everything since a certain date
+		else if(date != 0 && river == 0 && since != 0){ //return everything since a certain date
         	var e = conn.query('SELECT * FROM stats WHERE date >= ($1)',[date]);
 			socket.emit('returnData', getSpecData(e));
 		}
-		
-		function getSpecData(db){
-			var data = [];
-			db.on('data', function (row){
-				data.push(row);
-			});
-			db.on('end', function{
-				return data;
-			});
-		}
+	});
 	socket.on('newentries', function(date, river, lat, longitude, number)){
 		var x =0;
 		conn.query('SELECT river, date FROM visits')
@@ -87,6 +77,9 @@ io.on('connection', function(socket) {
 
 
 app.get('/', function(request, response){
+	response.render('index.html');
+});
+app.get('/submit', function(request, response){
 	var recent=0;
 	conn.query('SELECT date FROM stats')
 	.on('data', function(row){
@@ -113,13 +106,25 @@ app.get('/', function(request, response){
 					dates.push(row);
 				})
 				.on('end', function(){
-					response.render('index.html', {data: data, rivers: rivers, dates: dates});
+					response.render('submit.html', {data: data, rivers: rivers, dates: dates});
 				});
 			});
 		});
 	});
 });
+app.get('/export', function(request, response){
+	response.render('export.html');
+});
 
+function getSpecData(db){
+	var data = [];
+	db.on('data', function (row){
+		data.push(row);
+	});
+	db.on('end', function{
+		return data;
+	});
+}
 
 
 server.listen(8080)
