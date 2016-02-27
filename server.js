@@ -24,30 +24,30 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
-		var data = [];
 		//date and river |river | date | all rivers since a certain date | all
 		if(date == null && river == null && since == null){ //return all
 			var a = conn.query('SELECT * FROM stats');
 			socket.emit('returnData', getSpecData(a));
 		}
 		else if(date != null && river == null && since == null){ //return from date
-			var b = conn.query('SELECT * FROM stats WHERE date = $1', [date]);
+			var b = conn.query('SELECT * FROM stats WHERE date = ($1)', [date]);
 			socket.emit('returnData', getSpecData(b));
 		}
 		else if(date == null && river != null && since == null){ //return from river
-			var c = conn.query('SELECT * FROM stats WHERE river = $1', [river]);
+			var c = conn.query('SELECT * FROM stats WHERE river = ($1)', [river]);
 			socket.emit('returnData', getSpecData(c));
 		}
 		else if(date != null && river != null && since == null){ //return from both river and date
-			var d = conn.query('SELECT * FROM stats WHERE river = $1 AND date = $2', [river, date]);
+			var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 			socket.emit('returnData', getSpecData(d));
 		}
 		else if(date != null && river == null && since != null){ //return everything since a certain date
-        	var e = conn.query('SELECT * FROM stats WHERE date >= ($1)'[recent]);
+        	var e = conn.query('SELECT * FROM stats WHERE date >= ($1)',[date]);
 			socket.emit('returnData', getSpecData(e));
 		}
 		
 		function getSpecData(db){
+			var data = [];
 			db.on('data', function (row){
 				data.push(row);
 			});
@@ -72,6 +72,8 @@ io.on('connection', function(socket) {
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
 					sockets.emit('updateentries', river, date);
+					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, data]);
+					sockets.emit('returnData', getSpecData(special));
 				}	
 			});
 
