@@ -45,7 +45,13 @@ io.on('connection', function(socket) {
 			socket.emit('returnData', getSpecData(e));
 		}
 	});
-	socket.on('newentries', function(date, river, lat, longitude, number)){
+
+	socket.on('addColumn', function(name){ //adds comlumn with new data type, takes in column name 
+		conn.query('ALTER TABLE stats ADD ($1) float', name);
+		sockets.emit('newColumn');
+	});
+
+	socket.on('newentries', function(date, river, lat, longitude, number){
 		var x =0;
 		conn.query('SELECT river, date FROM visits')
 			.on('data', function(row){
@@ -122,7 +128,7 @@ function getSpecData(db){
 	db.on('data', function (row){
 		data.push(row);
 	});
-	db.on('end', function{
+	db.on('end', function(){
 		return data;
 	});
 }
