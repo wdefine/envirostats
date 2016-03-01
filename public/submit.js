@@ -1,12 +1,3 @@
-function meta(name) {
-	var tag = document.querySelector('meta[name=' + name + ']');
-	if (tag != null )
-		return tag.content ;
-	return '';
-}
-var roomName = meta('roomName');
-
-
 var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function() {
 	document.getElementById('???????').addEventListener('click', ????????? , false ); //click on #savebutton
@@ -15,7 +6,7 @@ window.addEventListener('load', function() {
 	socket.on('returnData', function(data){
 	});
 	socket.on('updateRiver', function(river){
-
+		//list of potential rivers
 	});
 	socket.on('updateDate', function(date){
 
@@ -24,7 +15,7 @@ window.addEventListener('load', function() {
 
 function new_event(){
 	date = new Date(year, month, day, 0, 0, 0);
-	socket.emit('newentries', date, river, number);
+	socket.emit('newentries', date, river);
 }
 function update_data(){
 	name = document.getElementById('????????').value;

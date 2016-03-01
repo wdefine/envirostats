@@ -45,7 +45,7 @@ io.on('connection', function(socket) {
 			socket.emit('returnData', getSpecData(e));
 		}
 	});
-	socket.on('newentries', function(date, river, lat, longitude, number)){
+	socket.on('newentries', function(date, river, lat, longitude)){
 		var x =0;
 		conn.query('SELECT river, date FROM visits')
 			.on('data', function(row){
@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
 			})
 			.on('end', function(){
 				if(x==0){
-					for(var i=0; i<number; i++){	
+					for(var i=0; i<10; i++){	
 						conn.query('INSERT INTO stats (date, river, site_number, lat, long) VALUES($1,$2,$3,$4,$5)',[date, river, i, lat, longitude]);
 					}
 					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
