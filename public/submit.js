@@ -4,12 +4,17 @@ window.addEventListener('load', function() {
 	socket.on('updatedata', function(identifier, column, value){
 	});
 	socket.on('returnData', function(data){
+		//make data currently on page = 0
+		//place new data on page
 	});
 	socket.on('updateRiver', function(river){
 		//list of potential rivers
 	});
 	socket.on('updateDate', function(date){
 
+	});
+	socket.on('newColumn', function(){
+		socket.emit('getdata', date, river, 0);//since will always be 0 in submit.js
 	});
  }, false );
 
@@ -19,15 +24,18 @@ function new_event(){
 	socket.emit('newentries', d, river);
 }
 function update_data(){
-	name = document.getElementById('????????').value;
+	var value = document.getElementById('????????').value;
 	// find a way to extract row(int) and column(string)
 	socket.emit('newdata', row, column, value);
 }
 function get_data(){
 	
-	socket.emit('getdata', date, river, since);
+	socket.emit('getdata', date, river, 0);//since will always be 0 in submit.js
 }
-
+function new_column(){
+	var name = document.getElementById('????????').value;
+	socket.emit('addColumn', name);
+}
 function get_date(number){
 	var d = new Date(number);
 	var date = d.setTime();
