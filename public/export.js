@@ -14,3 +14,8 @@ document.getElementById('???????').addEventListener('click', ????????? , false )
  function get_data(){
 	socket.emit('getdata', date, river, since);
 }
+function get_date(number){
+	var d = new Date(number);
+	var date = d.setTime();
+	return date; 
+}

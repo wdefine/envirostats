@@ -14,8 +14,9 @@ window.addEventListener('load', function() {
  }, false );
 
 function new_event(){
-	date = new Date(year, month, day, 0, 0, 0);
-	socket.emit('newentries', date, river);
+	var date = new Date(year, month, day, 0, 0, 0);
+	var d = date.UTC();
+	socket.emit('newentries', d, river);
 }
 function update_data(){
 	name = document.getElementById('????????').value;
@@ -25,4 +26,10 @@ function update_data(){
 function get_data(){
 	
 	socket.emit('getdata', date, river, since);
+}
+
+function get_date(number){
+	var d = new Date(number);
+	var date = d.setTime();
+	return date; 
 }
