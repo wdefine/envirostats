@@ -113,7 +113,7 @@ app.get('/submit', function(request, response){
 					dates.push(row);
 				})
 				.on('end', function(){
-					response.render('submit.html', {data: data, rivers: rivers, dates: dates});
+					response.render('submit.html', {datas: data, rivers: river, dates: date});
 				});
 			});
 		});

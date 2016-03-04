@@ -3,7 +3,7 @@
 		<title>EnviroStats Database</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/tdbs/jquery/2.1.3/jquery.min.js"></script>
-		<script type="text/javascript" src="../public/main.js"></script>
+		<script type="text/javascript" src="../public/submit.js"></script>
 		<link rel="stylesheet" href="../public/css.css" type="text/css" />
 	
 		<meta name="riverData" content="{{riverData}}"/>
@@ -13,53 +13,39 @@
 		<header id="home_header">
 			<h1>Envirostats Database</h1>
 		</header>
-		<form method ="POST" action ="/" id="new_data">
+		<div id="newEntries">
 			<!-- when this button is pushed, a new row is added to the table which can be edited with all the data later -->
 			<input type="text" name="river" placeholder="River Name">
-			<input type="date" name="date" placeholder="Date">
-			<select id="new_site">
-			  <option value="s1">Site 1</option>
-			  <option value="s2">Site 2</option>
-			  <option value="s3">Site 3</option>
-			  <option value="s4">Site 4</option>
-			  <option value="s1">Site 5</option>
-			  <option value="s2">Site 6</option>
-			  <option value="s3">Site 7</option>
-			  <option value="s4">Site 8</option>
-			  <option value="s3">Site 9</option>
-			  <option value="s4">Site 10</option>
-			</select>
-			<input type ="submit" value ="Add New Data">
-		</form>
+			<input type="date" name="date" placeholder="Date">s
+			<button type="button" id="newEntriesButton">SUBMIT</button>
+		</div>
 		<header2 id="home_header2">
-			<h3 id="label">Data at 
+			<h3 id="label">
 				<select id="river_choice">
-				  <option value="r1">River 1</option>
-				  <option value="r2">River 2</option>
-				  <option value="r3">River 3</option>
-				  <option value="r4">River 4</option>
+					{{#rivers}}
+						<option value="{{river}}">{{river}}</option>
+					{{/rivers}}
 				</select> on 
 				<select id="date_choice">
-				  <option value="d1">Date 1</option>
-				  <option value="d2">Date 2</option>
-				  <option value="d3">Date 3</option>
-				  <option value="d4">Date 4</option>
+					{{#dates}}
+						<option value="{{date}}">{{date}}</option>
+					{{/dates}}
 				</select></h3>
-				<h3><a href="export.html" id="export_button">Export</a></h3>
+				<button type="button" id="update_button">Change Data</h3>
 		</header2>
 		
 		<table id="left_table" border=".5">
 			<div class="sticky">
-				<tr><td>Site 1</td></tr>
-				<tr><td>Site 2</td></tr>
-				<tr><td>Site 3</td></tr>
-				<tr><td>Site 4</td></tr>
-				<tr><td>Site 5</td></tr>
-				<tr><td>Site 6</td></tr>
-				<tr><td>Site 7</td></tr>
-				<tr><td>Site 8</td></tr>
-				<tr><td>Site 9</td></tr>
-				<tr><td>Site 10</td></tr>
+				<tr><td>Grid #1</td></tr>
+				<tr><td>Grid #2</td></tr>
+				<tr><td>Grid #3</td></tr>
+				<tr><td>Grid #4</td></tr>
+				<tr><td>Grid #5</td></tr>
+				<tr><td>Grid #6</td></tr>
+				<tr><td>Grid #7</td></tr>
+				<tr><td>Grid #8</td></tr>
+				<tr><td>Grid #9</td></tr>
+				<tr><td>Grid #10</td></tr>
 			</div>
 		</table>
 
@@ -68,7 +54,6 @@
 			<tr id="headers">
 				<td>Latitude</td>
 				<td>Longitude</td>
-				<td>Grid #</td>
 				<td>Flow (m/s)</td>
 				<td>Phosphates (mol/L)</td>
 				<td>Temperature (deg C)</td>
@@ -79,39 +64,45 @@
 				<td>Turbidity (NTU)</td>
 				<td>DO (%)</td>
 				<td>BOD (%)</td>
-				<td>BOD% - DO%</td>				
-				<td>Soil</td>
+				<td>BOD% - DO%</td>	
+				<td>V.Constricta</td>
+				<td>S.Undulatus</td>
+				<td>P.Collina</td>			
 				<td>BOD/hr</td>				
 				<td>E.Coli (/ 1mL)</td>
 				<td>Benthic Score</td>
+				<td>Soil</td>
 				<td>Plankton</td>
 				<td>Fish</td>
 			</tr>
-			{{#riverData}} <!-- for every row of data in river data, add a row to the table -->
-				<tr id="row">
-					<td>{{Latitude}}</td>
-					<td>{{Longitude}}</td>
-					<td>{{Grid}}</td>
-					<td>{{Flow}}</td>
-					<td>{{Phosphates}}</td>
-					<td>{{Temperature}}</td>
-					<td>{{ph}}</td>
-					<td>{{Conductivity}}</td>
-					<td>{{Ammonium}}</td>
-					<td>{{Nitrates}}</td>
-					<td>{{Turbidity}}</td>
-					<td>{{DO}}</td>
-					<td>{{BOD}}</td>
-					<td>{{BODDO}}</td>
-					<td>{{Soil}}</td>
-					<td>{{BOD/hr}}</td>
-					<td>{{E.Coli}}</td>
-					<td>{{Benthic}}</td>
-					<td>{{Plankton}}</td>
-					<td>{{Fish}}</td>
-				</tr>
-			{{/riverData}}
-
+			<div id="data">
+				{{#datas}} <!-- for every row of data in river data, add a row to the table -->
+					<tr id="{{ident}}">
+						<td id="lat">{{lat}}</td>
+						<td id="lon">{{lon}}</td>
+						<td id="flow_rate">{{flow_rate}}</td>
+						<td id="phosphates">{{phosphates}}</td>
+						<td id="temperature">{{temperature}}</td>
+						<td id="ph">{{ph}}</td>
+						<td id="conductivity">{{conductivity}}</td>
+						<td id="">{{ammonium}}</td>
+						<td id="ammonium">{{nitrates}}</td>
+						<td id="turbidity">{{turbidity}}</td>
+						<td id="do_percent">{{do_percent}}</td>
+						<td id="bod_percent">{{bod_percent}}</td>
+						<td id="bod_column">{{bod_column}}</td>
+						<td id="v_constricta">{{v_constricta}}</td>
+						<td id="s_undulatus">{{s_undulatus}}</td>
+						<td id="p_collina">{{p_collina}}</td>
+						<td id="bod_hr">{{bod_hr}}</td>
+						<td id="ecoli">{{ecoli}}</td>
+						<td id="benthic_score">{{benthic_score}}</td>
+						<td id="soil">{{soil}}</td>
+						<td id="plankton">{{plankton}}</td>
+						<td id="fish">{{fish}}</td>
+					</tr>
+				{{/datas}}
+			</div>
 		</table>
 		</div>
 	</body>
