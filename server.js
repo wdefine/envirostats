@@ -15,7 +15,17 @@ app.use(express.static(__dirname + '/public'));
 
 
 io.on('connection', function(socket) {
-	// These functions can be socket or post/get 
+	// These functions can be socket or post/get
+	socket.on('getVisits', function(){
+		var data = [];
+		conn.query('SELECT river, date FROM visits')
+		.on('data', function(row){
+			data.push(row);
+		})
+		.on('end', function(){
+			socket.emit('returnVisits', data)
+		});
+	});
 	socket.on('newdata', function(identifier, column, value){
 		conn.query('UPDATE stats SET ($2)=($3) WHERE ident=($1)', [identifier, column, value])
 		.on("end", function() {
@@ -47,8 +57,11 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('addColumn', function(name){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', name);
-		sockets.emit('newColumn');
+		conn.query('ALTER TABLE stats ADD ($1) float', [name]);
+		//
+		//edit mustahce file
+		//
+		sockets.emit('newColumn', name);
 	});
 
 	socket.on('newentries', function(date, river, lat, longitude, number){
@@ -69,12 +82,7 @@ io.on('connection', function(socket) {
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
 					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, data]);
 					sockets.emit('returnData', getSpecData(special));
-					if(row.river != river){
-						sockets.emit('updateRiver', river);
-					}
-					if(row.date != date){
-						sockets.emit('updateDate', date);
-					}
+					sockets.emit('updateRiverDate', river, date);
 				}	
 			});
 
@@ -98,6 +106,9 @@ app.get('/submit', function(request, response){
 		var data = [];
 		conn.query('SELECT * FROM stats WHERE date >= ($1)'[recent])
 		.on('data', function(row){
+			row.date = getRealDate(row.date);
+			var date = row.date;
+			var river = row.river;
 			data.push(row);
 		})		
 		.on('end', function(){
@@ -107,14 +118,7 @@ app.get('/submit', function(request, response){
 				rivers.push(row);
 			})
 			.on('end', function(){
-				var dates = [];
-				conn.query('SELECT * FROM dates')
-				.on('data', function(row){
-					dates.push(row);
-				})
-				.on('end', function(){
-					response.render('submit.html', {datas: data, rivers: river, dates: date});
-				});
+				response.render('submit.html', {datas: data, rivers: river, metariver:river, metadate:date});
 			});
 		});
 	});
@@ -126,12 +130,17 @@ app.get('/export', function(request, response){
 function getSpecData(db){
 	var data = [];
 	db.on('data', function (row){
+		row.date = getRealDate(row.date);
 		data.push(row);
 	});
 	db.on('end', function(){
 		return data;
 	});
 }
-
+function getRealDate(number){
+	var d = new Date(number);
+	var date = d.toJSON().substring(0,10);
+	return date; 
+}
 
 server.listen(8080)
