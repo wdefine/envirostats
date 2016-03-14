@@ -30,7 +30,7 @@ window.addEventListener('load', function() {
 		}
 	});
 	socket.on('updatedata', function(identifier, column, value){
-		document.getElementById('identifier').getElementsByClassName('column').innerHTML = value;
+		document.getElementById('\''+identifier+'\'').getElementsByClassName('\''+column+'\'').innerHTML = value;//
 	});
 	socket.on('returnData', function(data){
 		document.getElementById('data').river=data[0].river;
@@ -114,7 +114,7 @@ function update_data(row, column){
 	//
 	//I would like to find a way to not update the server on every new keypress.
 	//
-	var value = document.getElementById('row').getElementsByClassName('column').value;
+	var value = document.getElementById('\''+row+'\'').getElementsByClassName('\''+column+'\'').value;
 	socket.emit('newdata', row, column, value);
 }
 function get_data(){

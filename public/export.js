@@ -1,9 +1,11 @@
 /*
 TODO:
 1. On hover over column header, show x for deletion for data exportation. -and over grid number for row -css edit -MOST IMPORTANT
-2. configure all of the handlers for the different search options -make user interface clean or simplify -html,css,js
+2. configure all of the handlers for the different search options -make user interface clean or simplify -html,css
 3. find to export dataArray to csv file -??? -MOST IMPORTANT
 4. sync what export.js needs to look like with what it looks like in this file -html
+5. After search, make selected index = ---Select--- so they cant press submit twice
+6. Check to see if data is already on page before adding it to page
 */
 var grid_counter = 0; //for counting the rows on the page
 var entries = 0; //for knowing how much data is on page
@@ -15,13 +17,15 @@ window.addEventListener('load', function(){
 	socket.emit('getVisits');
 	document.getElementById('undoDelete').addEventListener('click', undo_delete , false );
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false );
+	document.getElementById('riverButton').addEventListener('click', get_data, false);
+	document.getElementById('sinceButton').addEventListener('click', since_dates, false);
 	document.getElementById('exportButton').addEventListener('click', export_data , false );
 	//
 	//listeners for get requests here:
 	//Either write multiple get_data functions for each type of request or input date, river, since into get_data -remember null=0.
 	//
 	socket.on('updatedata', function(identifier, column, value){
-		document.getElementById('identifier').getElementById('column').innerHTML = value;
+		document.getElementById('\''+identifier+'\'').getElementById('\''+column+'\'').innerHTML = value;
 	});
 	socket.on('returnData', function(data){
 		entries += data.length()/10;
@@ -105,7 +109,24 @@ window.addEventListener('load', function(){
 	});
  }, false );
  function get_data(){
-	socket.emit('getdata', date, river, since);
+ 	var river = document.getElementById('riverChoice')
+	var choicer = river.options[river.selectedIndex].value
+	var date = document.getElementById('dateChoice')
+	var choiced = date.options[date.selectedIndex].value
+	if(choicer != "---Select---" && choiced != "---Select---"){
+		socket.emit('getdata', choiced, choicer, 0);
+	}
+	else if(choicer != "---Select---" && choiced == "---Select---"){
+		socket.emit('getdata', 0, choicer, 0);
+	}
+	//change selected index to ---Select--
+}
+function since_dates(){
+	var date = document.getElementById('dateSince').value;
+	if(date != "---Select---"){
+		socket.emit('getdata', date, 0,1);
+	}
+	// change selected index to ---Select---
 }
 function get_date(number){
 	var d = new Date(number);
