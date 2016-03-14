@@ -128,12 +128,6 @@ function since_dates(){
 	}
 	// change selected index to ---Select---
 }
-function get_date(number){
-	var d = new Date(number);
-	var date = d.setTime();
-	return date; 
-}
-
 function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value

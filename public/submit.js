@@ -132,11 +132,6 @@ function new_column(){
 		socket.emit('addColumn', name);
 	}
 }
-function get_date(number){
-	var d = new Date(number);
-	var date = d.setTime(); //sets date = milliseconds after 1970
-	return date; 
-}
 function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
