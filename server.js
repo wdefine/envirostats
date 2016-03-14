@@ -38,10 +38,10 @@ io.on('connection', function(socket) {
 			var a = conn.query('SELECT * FROM stats');
 			socket.emit('returnData', getSpecData(a));
 		}
-		else if(date != 0 && river == 0 && since == 0){ //return from date
+		/*else if(date != 0 && river == 0 && since == 0){ //return from date
 			var b = conn.query('SELECT * FROM stats WHERE date = ($1)', [date]);
 			socket.emit('returnData', getSpecData(b));
-		}
+		}*/
 		else if(date == 0 && river != 0 && since == 0){ //return from river
 			var c = conn.query('SELECT * FROM stats WHERE river = ($1)', [river]);
 			socket.emit('returnData', getSpecData(c));
