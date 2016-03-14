@@ -1,0 +1,116 @@
+<html> 
+	<head>
+		<title>EnviroStats Database</title>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/tdbs/jquery/2.1.3/jquery.min.js"></script>
+		<script type="text/javascript" src="../public/submit.js"></script>
+		<link rel="stylesheet" href="../public/css.css" type="text/css" />
+	
+		<meta name="riverData" content="{{riverData}}"/>
+	</head>
+
+	<body id="index_body"> 
+		<header id="home_header">
+			<h1>Envirostats Database</h1>
+		</header>
+		<div id="newEntries">
+			<!-- when this button is pushed, a new row is added to the table which can be edited with all the data later -->
+			<input id="newRiver" type="text" name="river" placeholder="River Name">
+			<input id="newDate" type="date" name="date" placeholder="Date">
+			<button type="button" id="newEntriesButton">NEW EVENT</button>
+		</div>
+		<header2 id="home_header2">
+			<h3 id="label">
+				<select id="riverChoice">
+						<option value="">---Select---</option>
+					{{#rivers}}
+						<option value="{{river}}">{{river}}</option>
+					{{/rivers}}
+				</select> on 
+				<select id="dateChoice">
+						<option value="">---Select---</option>
+				</select></h3>
+				<button type="button" id="updateButton">Change Data</h3>
+		</header2>
+		<div>
+			<input id="columnName" type="text" placeholder="Column Name">
+			<button type="button" id="newColumnButton">NEW COLUMN</button>
+		</div>
+		<table id="left_table" border=".5">
+			<div id="rows">
+				<tr><td>Grid #1</td></tr>
+				<tr><td>Grid #2</td></tr>
+				<tr><td>Grid #3</td></tr>
+				<tr><td>Grid #4</td></tr>
+				<tr><td>Grid #5</td></tr>
+				<tr><td>Grid #6</td></tr>
+				<tr><td>Grid #7</td></tr>
+				<tr><td>Grid #8</td></tr>
+				<tr><td>Grid #9</td></tr>
+				<tr><td>Grid #10</td></tr>
+			</div>
+		</table>
+
+		<div id="data_box">
+			<table border=".5" id="right_table">
+			<tr id="headers">
+				<th>River</th>
+				<th>Date</th>
+				<th>Latitude</th>
+				<th>Longitude</th>
+				<th>Flow (m/s)</th>
+				<th>Phosphates (mol/L)</th>
+				<th>Temperature (deg C)</th>
+				<th>pH</th>
+				<th>Conductivity (uS/cm)</th>
+				<th>Ammonium (mg/L)</th>
+				<th>Nitrates (mg/L)</th>	
+				<th>Turbidity (NTU)</th>
+				<th>DO (%)</th>
+				<th>BOD (%)</th>
+				<th>BOD% - DO%</th>	
+				<th>V.Constricta</th>
+				<th>S.Undulatus</th>
+				<th>P.Collina</th>			
+				<th>BOD/hr</th>				
+				<th>E.Coli (/ 1mL)</th>
+				<th>Benthic Score</th>
+				<th>Soil</th>
+				<th>Plankton</th>
+				<th>Fish</th>
+			</tr>
+			<div id="data" river="{{metariver}}" date="{{metadate}}">
+				{{#datas}} <!-- for every row of data in river data, add a row to the table -->
+					<tr id="{{ident}}">
+						<td class="river">{{river}}</td>
+						<td class="date">{{date}}</td>
+						<td onkeypress="update_data({{ident}},lat)" contenteditable='true' class="lat">{{lat}}</td>
+						<td onkeypress="update_data({{ident}},lon)" contenteditable='true' class="lon">{{lon}}</td>
+						<td onkeypress="update_data({{ident}},flow_rate)" contenteditable='true' class="flow_rate">{{flow_rate}}</td>
+						<td onkeypress="update_data({{ident}},phosphates)" contenteditable='true' class="phosphates">{{phosphates}}</td>
+						<td onkeypress="update_data({{ident}},temperature)" contenteditable='true' class="temperature">{{temperature}}</td>
+						<td onkeypress="update_data({{ident}},ph)" contenteditable='true' class="ph">{{ph}}</td>
+						<td onkeypress="update_data({{ident}},conductivity)" contenteditable='true' class="conductivity">{{conductivity}}</td>
+						<td onkeypress="update_data({{ident}},ammonium)" contenteditable='true' class="ammonium">{{ammonium}}</td>
+						<td onkeypress="update_data({{ident}},nitrates)" contenteditable='true' class="nitrates">{{nitrates}}</td>
+						<td onkeypress="update_data({{ident}},turbidity)" contenteditable='true' class="turbidity">{{turbidity}}</td>
+						<td onkeypress="update_data({{ident}},do_percent)" contenteditable='true' class="do_percent">{{do_percent}}</td>
+						<td onkeypress="update_data({{ident}},bod_percent)" contenteditable='true' class="bod_percent">{{bod_percent}}</td>
+						<td onkeypress="update_data({{ident}},bod_column)" contenteditable='true' class="bod_column">{{bod_column}}</td>
+						<td onkeypress="update_data({{ident}},v_constricta)" contenteditable='true' class="v_constricta">{{v_constricta}}</td>
+						<td onkeypress="update_data({{ident}},s_undulatus)" contenteditable='true' class="s_undulatus">{{s_undulatus}}</td>
+						<td onkeypress="update_data({{ident}},p_collina)" contenteditable='true' class="p_collina">{{p_collina}}</td>
+						<td onkeypress="update_data({{ident}},bod_hr)" contenteditable='true' class="bod_hr">{{bod_hr}}</td>
+						<td onkeypress="update_data({{ident}},ecoli)" contenteditable='true' class="ecoli">{{ecoli}}</td>
+						<td onkeypress="update_data({{ident}},benthic_score)"contenteditable='true'class="benthic_score">{{benthic_score}}</td>
+						<td onkeypress="update_data({{ident}},soil)" contenteditable='true' class="soil">{{soil}}</td>
+						<td onkeypress="update_data({{ident}},plankton)" contenteditable='true' class="plankton">{{plankton}}</td>
+						<td onkeypress="update_data({{ident}},fish)" contenteditable='true' class="fish">{{fish}}</td>
+					</tr>
+				{{/datas}}
+			</div>
+		</table>
+		</div>
+	</body>
+
+</html>
