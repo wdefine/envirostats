@@ -4,65 +4,47 @@ TODO:
 2. configure all of the handlers for the different search options -make user interface clean or simplify -html,css
 3. find to export dataArray to csv file -??? -MOST IMPORTANT
 4. sync what export.js needs to look like with what it looks like in this file -html
-5. After search, make selected index = ---Select--- so they cant press submit twice
-6. Check to see if data is already on page before adding it to page
 */
 var grid_counter = 0; //for counting the rows on the page
 var entries = 0; //for knowing how much data is on page
 var dataArray = {};//for data exportation
 var deletions = []; //for keeping track of changes
-var visits = [];
+var visits = []; //for keeping track of visits
+var column = []; //for keeping track of columns
 var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
 	socket.emit('getVisits');
-	document.getElementById('undoDelete').addEventListener('click', undo_delete , false );
-	document.getElementById('riverChoice').addEventListener('change', add_dates , false );
-	document.getElementById('riverButton').addEventListener('click', get_data, false);
-	document.getElementById('sinceButton').addEventListener('click', since_dates, false);
-	document.getElementById('exportButton').addEventListener('click', export_data , false );
-	//
-	//listeners for get requests here:
-	//Either write multiple get_data functions for each type of request or input date, river, since into get_data -remember null=0.
-	//
+	document.getElementById('undoDelete').addEventListener('click', undo_delete , false ); //for undoing deletion of row/column
+	document.getElementById('riverChoice').addEventListener('change', add_dates , false ); //for updating date options for river
+	document.getElementById('riverButton').addEventListener('click', get_data, false); //for getting data by river or river/date
+	document.getElementById('sinceButton').addEventListener('click', since_dates, false); //for searching since a date
+	document.getElementById('exportButton').addEventListener('click', export_data , false ); //for exporting data
+
 	socket.on('updatedata', function(identifier, column, value){
-		document.getElementById('\''+identifier+'\'').getElementById('\''+column+'\'').innerHTML = value;
+		update_data_array(identifier, column, value);
+		document.getElementById('\''+identifier+'\'').getElementById('\''+column+'\'')[0].innerHTML = value;
 	});
 	socket.on('returnData', function(data){
-		entries += data.length()/10;
-		dataArray += data;
 		for(var i =0;i<data.length();i++){
-			grid_counter+=1;
-			document.getElementById('data').append("
-				<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\">
-					<td class=\"river\">"+data[i].river+"</td>
-					<td class=\"date\">"+data[i].date+"</td>
-					<td class=\"lat\">"+data[i].lat+"</td>
-					<td class=\"lon\">"+data[i].lon+"</td>
-					<td class=\"flow_rate\">"+data[i].flow_rate+"</td>
-					<td class=\"phosphates\">"+data[i].phosphates+"</td>
-					<td class=\"temperature\">"+data[i].temperature+"</td>
-					<td class=\"ph\">"+data[i].ph+"</td>
-					<td class=\"conductivity\">"+data[i].conductivity+"</td>
-					<td class=\"ammonium\">"+data[i].ammonium+"</td>
-					<td class=\"nitrates\">"+data[i].nitrates+"</td>
-					<td class=\"turbidity\">"+data[i].turbidity+"</td>
-					<td class=\"do_percent\">"+data[i].do_percent+"</td>
-					<td class=\"bod_percent\">"+data[i].bod_percent+"</td>
-					<td class=\"bod_column\">"+data[i].bod_column+"</td>
-					<td class=\"v_constricta\">"+data[i].v_constricta+"</td>
-					<td class=\"s_undulatus\">"+data[i].s_undulatus+"</td>
-					<td class=\"p_collina\">"+data[i].p_collina+"</td>
-					<td class=\"bod_hr\">"+data[i].bod_hr+"</td>
-					<td class=\"ecoli\">"+data[i].ecoli+"</td>
-					<td class=\"benthic_score\">"+data[i].benthic_score+"</td>
-					<td class=\"soil\">"+data[i].soil+"</td>
-					<td class=\"plankton\">"+data[i].plankton+"</td>
-					<td class=\"fish\">"+data[i].fish+"</td>
-				</tr>
-			");
+			if(overlap(data[i].ident)==false){
+				entries += 1;
+				dataArray += data[i];
+				grid_counter+=1;
+				document.getElementById('data').append("
+					<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\">
+						<td class=\"river\">"+data[i].river+"</td>
+						<td class=\"date\">"+data[i].date+"</td>
+					");
+				for(var j=0;j<column.length();j++){
+					document.getElementById('data').append("
+							<td class=\""+column[j]+"\">"+data[i].column[j]+"</td>
+						");
+				}
+				document.getElementById('data').append("</tr>");
 			document.getElementById('rows').append("
-				<tr class=\""+data[i].ident+"\" onkeypress=\"delete("+data[i].ident+")\"><td>Grid #"+grid_counter+"</td></tr>
+				<tr class=\""+data[i].ident+"\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>
 			");
+			}
 		} 
 	});
 	socket.on('updateRiverDate', function(river){
@@ -77,7 +59,7 @@ window.addEventListener('load', function(){
 		if(z==0){
 			visits.append({river:riv, dates:[date]})
 			document.getElementById('riverChoice').append("
-				<option value=\""+riv+"\">"+riv+"</option>
+				<option name=\"option\" value=\""+riv+"\">"+riv+"</option>
 			");
 		}
 	});
@@ -96,16 +78,25 @@ window.addEventListener('load', function(){
 		}
 	});
 	socket.on('newColumn', function(){
+		column.append(name);
 		document.getElementById('headers').append("
-			<th class=\""+name+"\" onkeypress=\"delete("+name+")\">"+name+"</th>
+			<th class=\""+name+"\" onkeypress=\"delete_column("+name+")\">"+name+"</th>
 		");
-		for(var i=0;i<entries*10;i++){//for all rows
+		for(var i=0;i<entries;i++){//for all rows
 			row.append("
 				<td class=\""+name+"\"></td>
 			");
 		}
-		
-
+		for(var i=0;i<entries/10;i++){
+			var dat = dataArray[i*10].date;
+			var riv = dataArray[i*10].river;
+			socket.emit('getdata', dat, riv, 0);
+		}
+	});
+	socket.on('allColumns', function(list){
+		for(var i =0;i<list.length();i++){
+			column.append(list[i]);
+		}
 	});
  }, false );
  function get_data(){
@@ -113,41 +104,37 @@ window.addEventListener('load', function(){
 	var choicer = river.options[river.selectedIndex].value
 	var date = document.getElementById('dateChoice')
 	var choiced = date.options[date.selectedIndex].value
-	if(choicer != "---Select---" && choiced != "---Select---"){
+	if(choicer != "" && choiced != ""){
 		socket.emit('getdata', choiced, choicer, 0);
 	}
-	else if(choicer != "---Select---" && choiced == "---Select---"){
+	else if(choicer != "" && choiced == ""){
 		socket.emit('getdata', 0, choicer, 0);
 	}
-	//change selected index to ---Select--
+	document.getElementById('riverChoice').getElementsByTagName('option')[0].selected = 'selected';
+	add_dates();
 }
 function since_dates(){
 	var date = document.getElementById('dateSince').value;
-	if(date != "---Select---"){
+	if(date != ""){
 		socket.emit('getdata', date, 0,1);
 	}
-	// change selected index to ---Select---
+	document.getElementById('dateSince').getElementsByTagName('option')[0].selected = 'selected';
 }
-function get_date(number){
-	var d = new Date(number);
-	var date = d.setTime();
-	return date; 
-}
-
 function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
 	document.getElementById('dateChoice').innerHTML ="";
 	document.getElementById('dateChoice').append("
-		<option value=\"\">---Select---</option>
+		<option name=\"option\" value=\"\">---Select---</option>
 	");
 	for(var i=0;i<visits.length();i++){
 		if(visits[i].river == choice){
 			for(var j=0; j<visits[i].dates.length();j++){
 				document.getElementById('dateChoice').append("
-					<option value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
+					<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
 					");
 			}
+			break;
 		}
 	}
 }
@@ -171,5 +158,16 @@ function export_data(){
 			}
 		}
 	}
-	//find way to export newArray into csv file
+	//find way to export newArray(array of objects) into csv file
+}
+function overlap(ident){
+	for(var i=0;i<dataArray.length();i++){
+		if(dataArray[i].ident == ident){
+			return true;
+		}
+	}
+	return false;
+}
+function update_data_array(row, column, value){
+
 }
