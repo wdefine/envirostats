@@ -9,6 +9,11 @@
  	-webkit-font-smoothing: antialiased;
 }
 
+p{
+	color: aliceblue;
+	font-weight: 500;
+}
+
 h1{
   font-size: 50px;
   color: #fff;
@@ -35,9 +40,14 @@ td{
 	padding: 5px 10px;
 	color: aliceblue;
 }
+th{
+	padding: 5px 10px;
+	color: aliceblue;
+}
 
 h3{
 	display: inline-block;
+	color: #fff;
 }
 
 a:link{
@@ -54,21 +64,46 @@ a:hover{
 }
 
 #label{
-	margin-right: 0px;
-	width: 75%;
+	margin-top: 0;
+	font-size: 20;
+}
+
+select{
+	margin-right: 10px;
+	margin-bottom: 20px;
+}
+
+#home_button{
+	position: absolute;
+	top: 20px;
+	left: 50px;
+	margin-right: 50px;
+	font-size: 28;
 }
 
 #left_table{
 	float: left;
 	color: lightgray;
 	font-weight: 500;
-  	margin: 110px 5px 0 10px;
+  	margin: 92px 5px 0 10px;
 	width: 75px;
 }
 
 #left_table td{
 	padding: 5px 8px;
 	font-weight: 500;
+}
+
+.ui-datepicker a{
+  color:black;
+}
+.ui-datepicker-calendar{
+  background-color: white;
+}
+
+#ui-datepicker-div{
+  background-color: white;
+
 }
 
 #right_table{
@@ -83,10 +118,10 @@ a:hover{
 	/*background-color: lightgray;*/
 	color: aliceblue;
 	width: 90%;
-	opacity: .75;
+	opacity: .9;
 	overflow: scroll;
 }
-#data{
+#row{
 	padding: 0 10px;
 }
 
@@ -94,3 +129,17 @@ a:hover{
 	margin-top: 350px;
 }
 
+#export_button{
+	position: absolute;
+	top: 30px;
+	right: 60px;
+	font-size: 25;
+	padding-left: 10%;
+}
+
+#export_data_box{
+	overflow: scroll;
+	font-family: arial;
+	background-color: black;
+	opacity: .8;
+}
