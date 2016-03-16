@@ -57,15 +57,16 @@ window.addEventListener('load', function() {
 			");
 		}
 	});
-	socket.on('newColumn', function(name){
+	socket.on('newColumn', function(namey, niceName){
 		column.append(name);
 		document.getElementById('headers').append("
-			<th>"+name+"</th>
+			<th>"+niceName+"</th>
 		");
 		var riv = document.getElementById('data').river;
 		var dat = document.getElementById('data').date;
+		var divy = document.getElementById('data');
 		for(var i=0;i<10;i++){
-			//for row[i] in table
+			var row = divy.children[i];
 			row.append("
 				<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>
 			");
@@ -92,9 +93,6 @@ function new_event(){
 	}
 }
 function update_data(row, column){
-	//
-	//I would like to find a way to not update the server on every new keypress.
-	//
 	var value = document.getElementById('\''+row+'\'').getElementsByClassName('\''+column+'\'')[0].value;
 	socket.emit('newdata', row, column, value);
 }
@@ -109,11 +107,13 @@ function get_data(){
 	document.getElementById('riverChoice').getElementsByTagName('option')[0].selected = 'selected';
 	add_dates();
 }
-function new_column(){
-	var name = document.getElementById('columnName').value;
-	if(name != "" && name != /* an Integer*/){
-		socket.emit('addColumn', name);
+function new_column(){ ///////////////make niceName and shortname
+	var niceName = document.getElementById('columnName').value;
+	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');;
+	if(name != "" &&){
+		socket.emit('addColumn', name, niceName);
 	}
+	document.getElementById('columnName').value = "";
 }
 function add_dates(){
 	var river = document.getElementById('riverChoice')
@@ -128,6 +128,7 @@ function add_dates(){
 				document.getElementById('dateChoice').append("
 					<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
 				");
+				break;
 			}
 		}
 	}
