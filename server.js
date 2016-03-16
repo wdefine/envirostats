@@ -56,13 +56,15 @@ io.on('connection', function(socket) {
 		}
 	});
 
-	socket.on('addColumn', function(name){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', [name]);
+	socket.on('addColumn', function(namey, nicename){ //adds comlumn with new data type, takes in column name 
+		conn.query('ALTER TABLE stats ADD ($1) float', [namey]);
 		//
 		//edit mustahce file
 		//
-		conn.query('INSERT INTO columns (name) VALUES ($1)',[name]);
-		sockets.emit('newColumn', name);
+
+		/////namey first nicenames second
+		conn.query('INSERT INTO columns VALUES ($1, $2)',[namey, nicename]);
+		sockets.emit('newColumn', namey, nicename);
 	});
 
 	socket.on('newentries', function(date, river){
@@ -99,31 +101,33 @@ app.get('/submit', function(request, response){
 	var recent=0;
 	conn.query('SELECT date FROM stats')
 	.on('data', function(row){
-		if(row.date >recent){
+		if(row.date > recent){
 			recent = row.date;
 		}
 	})
 	.on('end', function(){
-		conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])
+		conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])//not sure if this recent thing works
 		.on('data', function(row){
 			var date = getRealDate(row.date);
-			var river = row.river;
+			var river = row.river; //there is an error here if you try to run it
 		})		
 		.on('end', function(){
-			var river = [];
+			var rivers = [];
 			conn.query('SELECT * FROM rivers')
 			.on('data', function(row){
-				rivers.push(row);
+				rivers.push(row.river);
 			})
 			.on('end', function(){
 				column = [];
+				nicecolumn = [];
 				conn.query('SELECT * FROM columns')
 				.on('data', function(row){
-					column.push(row);
+					column.push(row.namey);
+					nicecolumn.push(row.niceNames);
 				})
 				.on('end',function(){
-					response.render('submit.html', {columns:column, rivers: river, metariver:river, metadate:date});
-					socket.emit('allColumns', column);
+					response.render('submit.html', {columns: column, rivers: rivers, metariver: river, metadate: date});
+					socket.emit('allColumns', column, nicecolumn);
 					socket.emit('returnData');//where river=metariver and date=metadate
 					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 					socket.emit('returnData', getSpecData(g));
@@ -132,6 +136,7 @@ app.get('/submit', function(request, response){
 		});
 	});
 });
+
 app.get('/export', function(request, response){
 	//get river date and column here
 	var headerList = [];
@@ -151,11 +156,11 @@ app.get('/export', function(request, response){
 			var dates =[];
 			conn.query('SELECT * FROM dates')
 			.on('data',function(row){
-				dates.push(row);
+				dates.push({date:row.date});
 			})
 			.on('end', function(){
-				response.render('export.html', {columns: headerList, rivers: riverList});
-				socket.emit('allColumns', columns:headerList);
+				response.render('export.html', {columns: headerList, rivers: riverList, dates:dates});
+				//sockets.emit('allColumns', headerList);
 			});
 			
 		});
