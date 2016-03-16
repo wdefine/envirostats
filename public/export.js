@@ -3,15 +3,12 @@ TODO:
 1. On hover over column header, show x for deletion for data exportation. -and over grid number for row -css edit
 2. do css for buttons/ add export/undodelete buttons -css and html
 3. find to export dataArray to fathom -export.js
-4. Write updateDataArray function -export.js
-5. get export.html and returnData in get submit.html  -server.js
 6. Write index.js and index.html -brozey
 TOMAYBEDO:
 7. Make newColumns only available to teachers -server.js, clientside js
 8. Track changes in database -server.js
 	8a track the user 
 	8b make database
-
 */
 var grid_counter = 0; //for counting the rows on the page
 var entries = 0; //for knowing how much data is on page
@@ -85,14 +82,16 @@ window.addEventListener('load', function(){
 			}		
 		}
 	});
-	socket.on('newColumn', function(){
+	socket.on('newColumn', function(namey, niceName){
 		column.append(name);
 		document.getElementById('headers').append("
-			<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+name+"</th>
+			<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+niceName+"</th>
 		");
-		for(var i=0;i<entries;i++){//for all rows
+		var divy = document.getElementById('exdata');
+		for(var i=0;i<divy.children.length;i++){
+			var row = divy.children[i];
 			row.append("
-				<td class=\""+name+"\"></td>
+				<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>
 			");
 		}
 		for(var i=0;i<entries/10;i++){
@@ -178,5 +177,10 @@ function overlap(ident){
 	return false;
 }
 function update_data_array(row, column, value){
-
+	for(var i=0;i<dataArray.length();i++){
+		if(dataArray[i].ident == row){
+			dataArray.column = value;
+			break;
+		}
+	}
 }
