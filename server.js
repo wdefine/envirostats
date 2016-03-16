@@ -113,7 +113,7 @@ app.get('/submit', function(request, response){
 			var river = [];
 			conn.query('SELECT * FROM rivers')
 			.on('data', function(row){
-				river.push(row);
+				rivers.push(row);
 			})
 			.on('end', function(){
 				column = [];
@@ -122,9 +122,11 @@ app.get('/submit', function(request, response){
 					column.push(row);
 				})
 				.on('end',function(){
-					response.render('submit.html', {rivers: river, metariver:river, metadate:date});
+					response.render('submit.html', {columns:column, rivers: river, metariver:river, metadate:date});
 					socket.emit('allColumns', column);
 					socket.emit('returnData');//where river=metariver and date=metadate
+					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+					socket.emit('returnData', getSpecData(g));
 				});
 			});
 		});
@@ -137,7 +139,7 @@ app.get('/export', function(request, response){
 	var z = conn.query('SELECT * FROM columns');
 	z.on('data', function(row){
 		//console.log(row.niceNames);
-		headerList.push({type:row.niceNames});
+		headerList.push({type:row.niceNames, classnames:row.namey});
 	});
 	z.on('end', function(){
 		var q = conn.query('SELECT * FROM rivers');
@@ -146,9 +148,18 @@ app.get('/export', function(request, response){
 			riverList.push({river:row.river});
 		});
 		q.on('end', function(){
-			response.render('export.html', {headers: headerList, rivers: riverList});
+			var dates =[];
+			conn.query('SELECT * FROM dates')
+			.on('data',function(row){
+				dates.push(row);
+			})
+			.on('end', function(){
+				response.render('export.html', {columns: headerList, rivers: riverList});
+				socket.emit('allColumns', columns:headerList);
+			});
+			
 		});
-			//socket.emit('allColumns', column); 
+			 
 	});
 	
 	
