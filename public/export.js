@@ -30,19 +30,19 @@ window.addEventListener('load', function(){
 				entries += 1;
 				dataArray += data[i];
 				grid_counter+=1;
-				document.getElementById('data').append("
+				document.getElementById('exdata').append("
 					<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\">
 						<td class=\"river\">"+data[i].river+"</td>
 						<td class=\"date\">"+data[i].date+"</td>
 					");
 				for(var j=0;j<column.length();j++){
-					document.getElementById('data').append("
+					document.getElementById('exdata').append("
 							<td class=\""+column[j]+"\">"+data[i].column[j]+"</td>
 						");
 				}
-				document.getElementById('data').append("</tr>");
+				document.getElementById('exdata').append("</tr>");
 			document.getElementById('rows').append("
-				<tr class=\""+data[i].ident+"\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>
+				<tr class=\""+data[i].ident+" deletable\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>
 			");
 			}
 		} 
@@ -80,7 +80,7 @@ window.addEventListener('load', function(){
 	socket.on('newColumn', function(){
 		column.append(name);
 		document.getElementById('headers').append("
-			<th class=\""+name+"\" onkeypress=\"delete_column("+name+")\">"+name+"</th>
+			<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+name+"</th>
 		");
 		for(var i=0;i<entries;i++){//for all rows
 			row.append("

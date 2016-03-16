@@ -122,7 +122,7 @@ app.get('/submit', function(request, response){
 					column.push(row);
 				})
 				.on('end',function(){
-					response.render('submit.html', {rivers: river, metariver:river, metadate:date});
+					response.render('submit.html', {columns:column, rivers: river, metariver:river, metadate:date});
 					socket.emit('allColumns', column);
 					socket.emit('returnData');//where river=metariver and date=metadate
 				});
@@ -132,7 +132,7 @@ app.get('/submit', function(request, response){
 });
 app.get('/export', function(request, response){
 	//get river date and column here
-	response.render('export.html', rivers:river, dates:date,);
+	response.render('export.html', columns:column,rivers:river, dates:date,);
 	socket.emit('allColumns', column);
 });
 
