@@ -1,12 +1,3 @@
-/*
-TODO:
-1. permanently edit html files from server.js (on new column event, add columns to mustache files) -minster -MOST IMPORTANT
-2. create delay on keypress by limiting the number of times update_data is called from html -??? -may not be neccesary
-3. Make sure the date coming from html is in YYYY-MM-DD format. -research/testing
-4. Make newColumn only available to teachers  -tokens -may not be neccesary
-5. GetElementsByClassName???? -it should light up as blue -syntax
-6. Are html calls in right format -minster
-*/
 var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];

@@ -1,9 +1,17 @@
 /*
 TODO:
-1. On hover over column header, show x for deletion for data exportation. -and over grid number for row -css edit -MOST IMPORTANT
-2. configure all of the handlers for the different search options -make user interface clean or simplify -html,css
-3. find to export dataArray to csv file -??? -MOST IMPORTANT
-4. sync what export.js needs to look like with what it looks like in this file -html
+1. On hover over column header, show x for deletion for data exportation. -and over grid number for row -css edit
+2. do css for buttons/ add export/undodelete buttons -css and html
+3. find to export dataArray to fathom -export.js
+4. Write updateDataArray function -export.js
+5. get export.html and returnData in get submit.html  -server.js
+6. Write index.js and index.html -brozey
+TOMAYBEDO:
+7. Make newColumns only available to teachers -server.js, clientside js
+8. Track changes in database -server.js
+	8a track the user 
+	8b make database
+
 */
 var grid_counter = 0; //for counting the rows on the page
 var entries = 0; //for knowing how much data is on page

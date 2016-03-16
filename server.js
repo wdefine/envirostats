@@ -125,6 +125,8 @@ app.get('/submit', function(request, response){
 					response.render('submit.html', {columns:column, rivers: river, metariver:river, metadate:date});
 					socket.emit('allColumns', column);
 					socket.emit('returnData');//where river=metariver and date=metadate
+					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+					socket.emit('returnData', getSpecData(g));
 				});
 			});
 		});
@@ -132,8 +134,35 @@ app.get('/submit', function(request, response){
 });
 app.get('/export', function(request, response){
 	//get river date and column here
-	response.render('export.html', columns:column,rivers:river, dates:date,);
-	socket.emit('allColumns', column);
+	var headerList = [];
+	var riverList = [];
+	var z = conn.query('SELECT * FROM columns');
+	z.on('data', function(row){
+		//console.log(row.niceNames);
+		headerList.push({type:row.niceNames, classnames:row.namey});
+	});
+	z.on('end', function(){
+		var q = conn.query('SELECT * FROM rivers');
+		q.on('data', function(row){
+			console.log(row.river);
+			riverList.push({river:row.river});
+		});
+		q.on('end', function(){
+			var dates =[];
+			conn.query('SELECT * FROM dates')
+			.on('data',function(row){
+				dates.push(row);
+			})
+			.on('end', function(){
+				response.render('export.html', {columns: headerList, rivers: riverList});
+				socket.emit('allColumns', columns:headerList);
+			});
+			
+		});
+			 
+	});
+	
+	
 });
 
 function getSpecData(db){
