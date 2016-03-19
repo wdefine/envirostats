@@ -10,44 +10,53 @@
 	</head>
 
 	<body id="index_body"> 
-		<header id="home_header">
-			<h1>Envirostats Database</h1>
-		</header>
+		<nav>
+			<div id="buttons">
+				<h3><a href="export.html">Export</a></h3>
+				<h3 id="logout"><a href="index.html">Logout</a></h3>
+			</div>	
+			<div id="home_header">
+				<h1>Envirostats Database</h1>
+			</div>
+			<div id="left_button">
+				<input id="columnName" type="text" size="15" placeholder="New Column Name">
+				<button type="button" id="newColumnButton">Create</button>
+			</div>
+		</nav>
+
 		<div id="newEntries">
 			<!-- when this button is pushed, a new row is added to the table which can be edited with all the data later -->
-			<input id="newRiver" type="text" name="river" placeholder="River Name">
-			<input id="newDate" type="date" name="date" placeholder="Date">
-			<button type="button" id="newEntriesButton">NEW EVENT</button>
+			<input id="newRiver" type="text" name="river" size="15" placeholder="River Name">
+			<input id="newDate" type="date" name="date" size="10" placeholder="Date">
+			<button type="button" id="newEntriesButton">Add New Data</button>
 		</div>
+		
 		<header2 id="home_header2">
-			<h3 id="label">
+			<h3 class="label">Currently Displaying Data at
 				<select id="riverChoice">
 						<option name="option" value="">---Select---</option>
 					{{#rivers}}
 						<option name="option" value="{{river}}">{{river}}</option>
 					{{/rivers}}
-				</select> on 
+				</select>on 
 				<select id="dateChoice">
 						<option name="option" value="">---Select---</option>
-				</select></h3>
-				<button type="button" id="updateButton">Change Data</h3>
+				</select>
+				<button type="button" id="updateButton" >Update
+			</h3>
 		</header2>
-		<div>
-			<input id="columnName" type="text" placeholder="Column Name">
-			<button type="button" id="newColumnButton">NEW COLUMN</button>
-		</div>
-		<table id="left_table" border=".5">
+		<table class="left_table" border=".5">
 			<div id="rows">
-				<tr><td>Row #1</td></tr>
-				<tr><td>Row #2</td></tr>
-				<tr><td>Row #3</td></tr>
-				<tr><td>Row #4</td></tr>
-				<tr><td>Row #5</td></tr>
-				<tr><td>Row #6</td></tr>
-				<tr><td>Row #7</td></tr>
-				<tr><td>Row #8</td></tr>
-				<tr><td>Row #9</td></tr>
-				<tr><td>Row #10</td></tr>
+				<tr><td>Grid #1</td></tr>
+				<tr><td>Grid #2</td></tr>
+				<tr><td>Grid #3</td></tr>
+				<tr><td>Grid #4</td></tr>
+				<tr><td>Grid #5</td></tr>
+				<tr><td>Grid #6</td></tr>
+				<tr><td>Grid #7</td></tr>
+				<tr><td>Grid #8</td></tr>
+				<tr><td>Grid #9</td></tr>
+				<tr><td>Grid #10</td></tr>
 			</div>
 		</table>
 
@@ -57,7 +66,7 @@
 				<th>river</th>
 				<th>date</th>
 				{{#columns}}
-					<th>{{niceNames}}</th>
+					<th>{{name}}</th>
 				{{/columns}}
 			</tr>
 			<div id="data" river="{{metariver}}" date="{{metadate}}">

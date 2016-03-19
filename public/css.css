@@ -7,6 +7,37 @@
 	height: 100%;
 	font-family: 'Avenir';
  	-webkit-font-smoothing: antialiased;
+ 	margin-top: 80px;
+}
+
+nav{
+	background-color: #4c4c53;
+	opacity: .85;
+	position: fixed;
+	vertical-align: top;
+	width: 100%;
+	height: 70px;
+	top: 0;
+}
+
+nav div{
+	display: inline-block;
+	margin: 0;
+}
+
+#left_button{
+	float: left;
+	margin: 25px 0 0 2%;
+}
+
+#left_button1{
+	float: left;
+	margin: 25px 0 0 7%;
+}
+
+#buttons{
+	float: right;
+	margin: -3px 2% 0 0;
 }
 
 p{
@@ -19,7 +50,7 @@ h1{
   color: #fff;
   text-shadow: 0px 0px 10px gray;
   font-weight: 500;
-  margin: 5px;
+  margin: 0 0 0 15px;
 }
 
 #home_header2{
@@ -56,54 +87,40 @@ a:link{
 }
 
 a:visited{
-  color: lightblue;
+  color: #92A7E0;
 }
 
 a:hover{
-  color: lightgray;
+  color: #D7FDEC;
 }
 
-#label{
-	margin-top: 0;
+.label{
+	margin-top: 15px;
 	font-size: 20;
+	color: #fff;
+}
+
+#since{
+	margin-left: 6%;
 }
 
 select{
 	margin-right: 10px;
-	margin-bottom: 20px;
+	background-color: aliceblue;
+	border-color: #4c4c53;
 }
 
-#home_button{
-	position: absolute;
-	top: 20px;
-	left: 50px;
-	margin-right: 50px;
-	font-size: 28;
-}
-
-#left_table{
+.left_table{
 	float: left;
-	color: lightgray;
+	color: #4c4c53;
 	font-weight: 500;
-  	margin: 92px 5px 0 10px;
-	width: 75px;
+  	margin: 60px 5px 0 10px;
+	width: 77px;
 }
 
-#left_table td{
-	padding: 5px 8px;
+.left_table td{
+	padding: 5px 2px;
 	font-weight: 500;
-}
-
-.ui-datepicker a{
-  color:black;
-}
-.ui-datepicker-calendar{
-  background-color: white;
-}
-
-#ui-datepicker-div{
-  background-color: white;
-
 }
 
 #right_table{
@@ -112,13 +129,8 @@ select{
 }
 #data_box{
 	text-align: center;
-	position: absolute;
-	top: 200px;
-	left: 90px;
-	/*background-color: lightgray;*/
 	color: aliceblue;
 	width: 90%;
-	opacity: .9;
 	overflow: scroll;
 }
 #row{
@@ -129,17 +141,64 @@ select{
 	margin-top: 350px;
 }
 
-#export_button{
-	position: absolute;
-	top: 30px;
-	right: 60px;
-	font-size: 25;
-	padding-left: 10%;
+#buttons h3{
+	font-size: 25px;
 }
 
-#export_data_box{
+#logout{
+	margin-left: 15px;
+}
+
+#exleft{
+	background-color: black;
+	margin-top: 35px;
+}
+
+#exdata{
 	overflow: scroll;
+	width: 85%;
 	font-family: arial;
 	background-color: black;
-	opacity: .8;
+	color: #4c4c53;
 }
+
+th.{{namey}}.deletable:hover, #exleft td:hover{
+	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
+	background-size: 10px 10px;
+	background-position: 95% 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+}
+
+div#undo{
+	float: right;
+	margin-top: -36px;
+	margin-right: 1%;
+	background-color: #eee;
+	background-image:url("https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png");
+	background-size: 25px 25px;
+	background-position: 2.5px 5px;
+	background-repeat: no-repeat;
+	width: 30px;
+	height: 36px;
+}
+
+div#undo:hover{
+	cursor: pointer;
+	background-color: #D7FDEC;
+}
+
+button{
+  font-size: 12px;
+  background-color: #4c4c53;
+  color: aliceblue;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-color: white;
+}
+
+button:hover{
+  background-color: #fff;
+  color: #000;
+}
+
