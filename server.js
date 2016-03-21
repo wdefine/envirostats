@@ -16,6 +16,69 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
 	// These functions can be socket or post/get
+	socket.on('submitStarter', function(){
+		var recent=0;
+		conn.query('SELECT date FROM stats')
+		.on('data', function(row){
+			if(row.date >recent){
+				recent = row.date;
+			}
+		})
+		.on('end', function(){
+			conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])
+			.on('data', function(row){
+				var date = getRealDate(row.date);
+				var river = row.river;
+			})		
+			.on('end', function(){
+				var river = [];
+				conn.query('SELECT * FROM rivers')
+				.on('data', function(row){
+					rivers.push(row);
+				})
+				.on('end', function(){
+					column = [];
+					conn.query('SELECT * FROM columns')
+					.on('data', function(row){
+						column.push(row);
+					})
+					.on('end',function(){
+						socket.emit('allColumns', column);
+						socket.emit('returnData');//where river=metariver and date=metadate
+						var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+						socket.emit('returnData', getSpecData(g));
+					});
+				});
+			});
+		});
+	});
+	socket.on('exportStarter', function(){
+		//get river date and column here
+		var headerList = [];
+		var riverList = [];
+		var z = conn.query('SELECT * FROM columns');
+		z.on('data', function(row){
+			//console.log(row.niceNames);
+			headerList.push({type:row.niceNames, classnames:row.namey});
+		});
+		z.on('end', function(){
+			var q = conn.query('SELECT * FROM rivers');
+			q.on('data', function(row){
+				console.log(row.river);
+				riverList.push({river:row.river});
+			});
+			q.on('end', function(){
+				var dates =[];
+				conn.query('SELECT * FROM dates')
+				.on('data',function(row){
+					dates.push(row);
+				})
+				.on('end', function(){
+					socket.emit('allColumns', columns:headerList);
+				});
+			});	 
+		});
+	});
 	socket.on('getVisits', function(){
 		var data = [];
 		conn.query('SELECT river, date FROM visits')
@@ -56,12 +119,12 @@ io.on('connection', function(socket) {
 		}
 	});
 
-	socket.on('addColumn', function(name){ //adds comlumn with new data type, takes in column name 
+	socket.on('addColumn', function(namey, niceName){ //adds comlumn with new data type, takes in column name 
 		conn.query('ALTER TABLE stats ADD ($1) float', [name]);
 		//
 		//edit mustahce file
 		//
-		conn.query('INSERT INTO columns (name) VALUES ($1)',[name]);
+		conn.query('INSERT INTO columns (namey, niceNames) VALUES ($1,$2)',[namey, niceName]);
 		sockets.emit('newColumn', name);
 	});
 
@@ -123,10 +186,6 @@ app.get('/submit', function(request, response){
 				})
 				.on('end',function(){
 					response.render('submit.html', {columns:column, rivers: river, metariver:river, metadate:date});
-					socket.emit('allColumns', column);
-					socket.emit('returnData');//where river=metariver and date=metadate
-					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
-					socket.emit('returnData', getSpecData(g));
 				});
 			});
 		});
@@ -155,14 +214,9 @@ app.get('/export', function(request, response){
 			})
 			.on('end', function(){
 				response.render('export.html', {columns: headerList, rivers: riverList});
-				socket.emit('allColumns', columns:headerList);
 			});
-			
-		});
-			 
+		});	 
 	});
-	
-	
 });
 
 function getSpecData(db){

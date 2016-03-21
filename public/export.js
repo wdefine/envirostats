@@ -18,6 +18,7 @@ var visits = []; //for keeping track of visits
 var column = []; //for keeping track of columns
 var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
+	socket.emit('exportStarter');
 	socket.emit('getVisits');
 	document.getElementById('undoDelete').addEventListener('click', undo_delete , false ); //for undoing deletion of row/column
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false ); //for updating date options for river
