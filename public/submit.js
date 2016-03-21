@@ -2,8 +2,11 @@ var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
 window.addEventListener('load', function() {
+	console.log('were here');
 	socket.emit('submitStarter');
+	console.log('were here now');
 	socket.emit('getVisits');
+	console.log('were here now here');
 	document.getElementById('newEntriesButton').addEventListener('click', new_event , false ); 
 	document.getElementById('newColumnButton').addEventListener('click', new_column , false );
 	document.getElementById('updateButton').addEventListener('click', get_data , false );
