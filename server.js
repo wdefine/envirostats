@@ -40,7 +40,6 @@ io.on('connection', function(socket) {
 				})
 				.on('end',function(){
 					socket.emit('allColumns', column);
-					socket.emit('returnData');//where river=metariver and date=metadate
 					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 					socket.emit('returnData', getSpecData(g));
 				});

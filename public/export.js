@@ -16,6 +16,7 @@ var dataArray = {};//for data exportation
 var deletions = []; //for keeping track of changes
 var visits = []; //for keeping track of visits
 var column = []; //for keeping track of columns
+var columnArray =["river","date"];
 var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
 	socket.emit('exportStarter');
@@ -83,8 +84,9 @@ window.addEventListener('load', function(){
 			}		
 		}
 	});
-	socket.on('newColumn', function(namey, niceName){
+	socket.on('newColumn', function(name, niceName){
 		column.append(name);
+		columnArray.append(name)
 		document.getElementById('headers').append("
 			<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+niceName+"</th>
 		");
@@ -104,6 +106,7 @@ window.addEventListener('load', function(){
 	socket.on('allColumns', function(list){
 		for(var i =0;i<list.length();i++){
 			column.append(list[i]);
+			columnArray.append(list[i]);
 		}
 	});
  }, false );
@@ -164,10 +167,36 @@ function export_data(){
 			}
 			else{
 				delete newArray[i].deletions[j];
+   				removeValue(columnArray, deletions[j]);
 			}
 		}
 	}
 	//find way to export newArray(array of objects) into csv file
+	var csvData = "data:text/csv;charset=utf-8,";
+        //headers
+        for(var i=0;i<columnArray.length();i++){
+        	csvData+= columnArray[j];
+        	if(i != columnArray.length()-1){
+        		csvData+=',';
+        	}
+        }
+        csvData+='\n';
+        //headers
+        //body
+        for(var i=0;i<newArray.length();i++){\
+        	for(var j=0;j<columnArray.length();j++){
+        		csvData+=newArray[i].columnArray[j];
+        		if(i != columnArray.length()-1){
+        			csvData+=',';
+        		}
+        		else{
+        			csvData+='\n';
+        		}
+        	}
+        }
+        //body
+        var encodedUri = encodeURI(csvData);
+        window.open(encodedUri);
 }
 function overlap(ident){
 	for(var i=0;i<dataArray.length();i++){
