@@ -21,81 +21,67 @@ var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
 	socket.emit('exportStarter');
 	socket.emit('getVisits');
-	document.getElementById('undoDelete').addEventListener('click', undo_delete , false ); //for undoing deletion of row/column
+	document.getElementById('undo').addEventListener('click', undo_delete , false ); //for undoing deletion of row/column
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false ); //for updating date options for river
 	document.getElementById('riverButton').addEventListener('click', get_data, false); //for getting data by river or river/date
 	document.getElementById('sinceButton').addEventListener('click', since_dates, false); //for searching since a date
-	document.getElementById('exportButton').addEventListener('click', export_data , false ); //for exporting data
+	document.getElementById('export').addEventListener('click', export_data , false ); //for exporting data
 
 	socket.on('updatedata', function(identifier, column, value){
 		update_data_array(identifier, column, value);
 		document.getElementById('\''+identifier+'\'').getElementById('\''+column+'\'')[0].innerHTML = value;
 	});
 	socket.on('returnData', function(data){
-		for(var i =0;i<data.length();i++){
+		for(var i =0;i<data.length;i++){
 			if(overlap(data[i].ident)==false){
 				entries += 1;
 				dataArray += data[i];
 				grid_counter+=1;
-				document.getElementById('exdata').append("
-					<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\">
-						<td class=\"river\">"+data[i].river+"</td>
-						<td class=\"date\">"+data[i].date+"</td>
-					");
-				for(var j=0;j<column.length();j++){
-					document.getElementById('exdata').append("
-							<td class=\""+column[j]+"\">"+data[i].column[j]+"</td>
-						");
+				document.getElementById('exdata').push("<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\"><td class=\"river\">"+data[i].river+"</td><td class=\"date\">"+data[i].date+"</td>");
+				for(var j=0;j<column.length;j++){
+					document.getElementById('exdata').push("<td class=\""+column[j]+"\">"+data[i].column[j]+"</td>");
 				}
-				document.getElementById('exdata').append("</tr>");
-			document.getElementById('rows').append("
-				<tr class=\""+data[i].ident+" deletable\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>
-			");
+				document.getElementById('exdata').push("</tr>");
+				document.getElementById('rows').push("<tr class=\""+data[i].ident+" deletable\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>");
 			}
 		} 
 	});
 	socket.on('updateRiverDate', function(river){
 		var z=0;
-		for(var i=0;i<visits.length();i++){
+		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
-				visits[i].dates.append(date);
+				visits[i].dates.push(date);
 				add_dates();
 			}
 		}
 		if(z==0){
-			visits.append({river:riv, dates:[date]})
-			document.getElementById('riverChoice').append("
-				<option name=\"option\" value=\""+riv+"\">"+riv+"</option>
-			");
+			visits.push({river:riv, dates:[date]})
+			document.getElementById('riverChoice').push("<option name=\"option\" value=\""+riv+"\">"+riv+"</option>");
 		}
 	});
 	socket.on('returnVisits', function(data){
-		for(var i=0;i<data.length();i++){
+		for(var i=0; i<data.length ;i++){
 			var x =0;
-			for(var j=0;j<visits.length();j++){
+			for(var j=0;j<visits.length;j++){
 				if(visits[j].river == data[i].river){
 					x=1;
-					visits[j].dates.append(data[i].date)
+					visits[j].dates.push(data[i].date)
 				}
 			}
 			if(x==0){
-				visits.append({river:data[i].river, dates:[data[i].date]})
+				visits.push({river:data[i].river, dates:[data[i].date]})
 			}		
 		}
 	});
 	socket.on('newColumn', function(name, niceName){
-		column.append(name);
-		columnArray.append(name)
-		document.getElementById('headers').append("
-			<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+niceName+"</th>
-		");
+		column.push(name);
+		columnArray.push(name)
+		document.getElementById('headers').push("<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+niceName+"</th>");
 		var divy = document.getElementById('exdata');
 		for(var i=0;i<divy.children.length;i++){
 			var row = divy.children[i];
-			row.append("
-				<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>
-			");
+			row.push("<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>");
 		}
 		for(var i=0;i<entries/10;i++){
 			var dat = dataArray[i*10].date;
@@ -104,9 +90,9 @@ window.addEventListener('load', function(){
 		}
 	});
 	socket.on('allColumns', function(list){
-		for(var i =0;i<list.length();i++){
-			column.append(list[i]);
-			columnArray.append(list[i]);
+		for(var i =0;i<list.length;i++){
+			column.push(list[i]);
+			columnArray.push(list[i]);
 		}
 	});
  }, false );
@@ -136,15 +122,11 @@ function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
 	document.getElementById('dateChoice').innerHTML ="";
-	document.getElementById('dateChoice').append("
-		<option name=\"option\" value=\"\">---Select---</option>
-	");
-	for(var i=0;i<visits.length();i++){
+	document.getElementById('dateChoice').push("<option name=\"option\" value=\"\">---Select---</option>");
+	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
-			for(var j=0; j<visits[i].dates.length();j++){
-				document.getElementById('dateChoice').append("
-					<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
-					");
+			for(var j=0; j<visits[i].dates.length;j++){
+				document.getElementById('dateChoice').push("<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>");
 			}
 			break;
 		}
@@ -160,8 +142,8 @@ function undo_delete(){
 }
 function export_data(){
 	var newArray = dataArray;
-	for(var i=0; i<newArray.length(); i++){
-		for(var j=0; j<deletions.length(); j++){
+	for(var i=0; i<newArray.length; i++){
+		for(var j=0; j<deletions.length; j++){
 			if(newArray[i].ident ==deletions[j]){
 				newArray.splice(i,1);
 			}
@@ -174,19 +156,19 @@ function export_data(){
 	//find way to export newArray(array of objects) into csv file
 	var csvData = "data:text/csv;charset=utf-8,";
         //headers
-        for(var i=0;i<columnArray.length();i++){
+        for(var i=0;i<columnArray.length;i++){
         	csvData+= columnArray[j];
-        	if(i != columnArray.length()-1){
+        	if(i != columnArray.length-1){
         		csvData+=',';
         	}
         }
         csvData+='\n';
         //headers
         //body
-        for(var i=0;i<newArray.length();i++){\
-        	for(var j=0;j<columnArray.length();j++){
+        for(var i=0;i<newArray.length;i++){
+        	for(var j=0;j<columnArray.length;j++){
         		csvData+=newArray[i].columnArray[j];
-        		if(i != columnArray.length()-1){
+        		if(i != columnArray.length-1){
         			csvData+=',';
         		}
         		else{
@@ -199,7 +181,7 @@ function export_data(){
         window.open(encodedUri);
 }
 function overlap(ident){
-	for(var i=0;i<dataArray.length();i++){
+	for(var i=0;i<dataArray.length;i++){
 		if(dataArray[i].ident == ident){
 			return true;
 		}
@@ -207,7 +189,7 @@ function overlap(ident){
 	return false;
 }
 function update_data_array(row, column, value){
-	for(var i=0;i<dataArray.length();i++){
+	for(var i=0;i<dataArray.length;i++){
 		if(dataArray[i].ident == row){
 			dataArray.column = value;
 			break;
