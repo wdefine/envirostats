@@ -37,10 +37,9 @@ window.addEventListener('load', function() {
 					<td class=\"river\">"+data[i].river+"</td>
 					<td class=\"date\">"+data[i].date+"</td>
 					");
-					for(var j=0;j<column.length();j++)
-						document.getElementById('data').append("
-							<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>
-					");}
+					for(var j=0;j<column.length();j++){
+						document.getElementById('data').append("<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>");
+					}
 					document.getElementById('data').append("</tr>");
 		}
 	});

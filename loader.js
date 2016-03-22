@@ -22,6 +22,7 @@ conn.query('CREATE TABLE columns ("namey" TEXT, "niceNames" TEXT)') //first is d
 	.on('end', function(){
 		console.log('Made table!');
 	});
+conn.query('INSERT INTO columns VALUES ($1, $2)', ["site_number","Site Number"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["lat","Latitude"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["lon","Longitude"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["flow_rate", "Flow Rate"]);
@@ -45,5 +46,4 @@ conn.query('INSERT INTO columns VALUES ($1, $2)', ["soil", "Soil"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["plankton", "Plankton"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["fish", "Fish"]);
 
-conn.query('INSERT INTO rivers VALUES ($1)', ["RIVER"]);
 
