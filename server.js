@@ -25,29 +25,24 @@ io.on('connection', function(socket) {
 			}
 		})
 		.on('end', function(){
+			var date;
+			var river;
 			conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])
 			.on('data', function(row){
-				var date = getRealDate(row.date);
-				var river = row.river;
+				date = getRealDate(row.date);
+				river = row.river;
 			})		
 			.on('end', function(){
-				var river = [];
-				conn.query('SELECT * FROM rivers')
+				column = [];
+				conn.query('SELECT * FROM columns')
 				.on('data', function(row){
-					rivers.push(row);
+					column.push(row.namey);
 				})
-				.on('end', function(){
-					column = [];
-					conn.query('SELECT * FROM columns')
-					.on('data', function(row){
-						column.push(row);
-					})
-					.on('end',function(){
-						socket.emit('allColumns', column);
-						socket.emit('returnData');//where river=metariver and date=metadate
-						var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
-						socket.emit('returnData', getSpecData(g));
-					});
+				.on('end',function(){
+					socket.emit('allColumns', column);
+					socket.emit('returnData');//where river=metariver and date=metadate
+					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+					socket.emit('returnData', getSpecData(g));
 				});
 			});
 		});
@@ -167,6 +162,8 @@ app.get('/submit', function(request, response){
 		}
 	})
 	.on('end', function(){
+		var date;
+		var river;
 		conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])//not sure if this recent thing works
 		.on('data', function(row){
 			var date = getRealDate(row.date);
@@ -176,17 +173,17 @@ app.get('/submit', function(request, response){
 			var rivers = [];
 			conn.query('SELECT * FROM rivers')
 			.on('data', function(row){
-				rivers.push(row.river);
+				rivers.push({rivernum: row.river});
 			})
 			.on('end', function(){
 				column = [];
 				conn.query('SELECT * FROM columns')
 				.on('data', function(row){
-					column.push(row.namey);
-					column.push(row.niceNames);
+					//column.push({row.namey});
+					column.push({niceNames: row.niceNames});
 				})
 				.on('end',function(){
-					response.render('submit.html', {columns: column, rivers: rivers, metariver: river, metadate: date});
+					response.render('data.html', {columns: column, rivers: rivers, metariver: river, metadate: date});
 				});
 			});
 		});

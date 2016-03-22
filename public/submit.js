@@ -2,16 +2,15 @@ var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
 window.addEventListener('load', function() {
-	console.log('were here');
+	console.log("hi!");
 	socket.emit('submitStarter');
-	console.log('were here now');
 	socket.emit('getVisits');
-	console.log('were here now here');
 	document.getElementById('newEntriesButton').addEventListener('click', new_event , false ); 
 	document.getElementById('newColumnButton').addEventListener('click', new_column , false );
 	document.getElementById('updateButton').addEventListener('click', get_data , false );
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false );
 	socket.on('returnVisits', function(data){
+		console.log("here!");
 		for(var i=0;i<data.length();i++){
 			var x =0;
 			for(var j=0;j<visits.length();j++){
