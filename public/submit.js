@@ -11,9 +11,9 @@ window.addEventListener('load', function() {
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false );
 	socket.on('returnVisits', function(data){
 		console.log("here!");
-		for(var i=0;i<data.length();i++){
+		for(var i=0;i<data.length;i++){
 			var x =0;
-			for(var j=0;j<visits.length();j++){
+			for(var j=0;j<visits.length;j++){
 				if(visits[j].river == data[i].river){
 					x=1;
 					visits[j].dates.append(data[i].date)
@@ -31,22 +31,23 @@ window.addEventListener('load', function() {
 		document.getElementById('data').river=data[0].river;
 		document.getElementById('data').date=data[0].date;
 		document.getElementById('data').innerHTML="";
-		for(var i =0;i<data.length();i++){
+		for(var i =0;i<data.length;i++){
 			document.getElementById('data').append("
 				<tr id=\""+data[i].ident+"\">
 					<td class=\"river\">"+data[i].river+"</td>
 					<td class=\"date\">"+data[i].date+"</td>
 					");
-					for(var j=0;j<column.length();j++)
+					for(var j=0;j<column.length;j++){
 						document.getElementById('data').append("
 							<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>
-					");}
+						");
+					}
 					document.getElementById('data').append("</tr>");
 		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
 		var z=0;
-		for(var i=0;i<visits.length();i++){
+		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
 				visits[i].dates.append(date);
@@ -77,7 +78,7 @@ window.addEventListener('load', function() {
 		soccket.emit('getdata', dat, riv, 0);
 	});
 	socket.on('allColumns', function(list){
-		for(var i =0;i<list.length();i++){
+		for(var i =0;i<list.length;i++){
 			column.append(list[i]);
 		}
 	});
@@ -125,9 +126,9 @@ function add_dates(){
 	document.getElementById('dateChoice').append("
 		<option name=\"option\" value=\"\">---Select---</option>
 	");
-	for(var i=0;i<visits.length();i++){
+	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
-			for(var j=0; j<visits[i].dates.length();j++){
+			for(var j=0; j<visits[i].dates.length;j++){
 				document.getElementById('dateChoice').append("
 					<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
 				");
