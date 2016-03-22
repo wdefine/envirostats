@@ -196,7 +196,7 @@ app.get('/export', function(request, response){
 	var z = conn.query('SELECT * FROM columns');
 	z.on('data', function(row){
 		//console.log(row.niceNames);
-		headerList.push({type:row.niceNames, classnames:row.namey});
+		headerList.push({namey:row.namey, niceNames:row.niceNames});
 	});
 	z.on('end', function(){
 		var q = conn.query('SELECT * FROM rivers');

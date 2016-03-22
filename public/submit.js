@@ -16,11 +16,11 @@ window.addEventListener('load', function() {
 			for(var j=0;j<visits.length;j++){
 				if(visits[j].river == data[i].river){
 					x=1;
-					visits[j].dates.append(data[i].date)
+					visits[j].dates.push(data[i].date)
 				}
 			}
 			if(x==0){
-				visits.append({river:data[i].river, dates:[data[i].date]})
+				visits.push({river:data[i].river, dates:[data[i].date]})
 			}		
 		}
 	});
@@ -32,17 +32,15 @@ window.addEventListener('load', function() {
 		document.getElementById('data').date=data[0].date;
 		document.getElementById('data').innerHTML="";
 		for(var i =0;i<data.length;i++){
-			document.getElementById('data').append("
+			document.getElementById('data').push("
 				<tr id=\""+data[i].ident+"\">
 					<td class=\"river\">"+data[i].river+"</td>
 					<td class=\"date\">"+data[i].date+"</td>
 					");
 					for(var j=0;j<column.length;j++){
-						document.getElementById('data').append("
-							<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>
-						");
+						document.getElementById('data').push("<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>");
 					}
-					document.getElementById('data').append("</tr>");
+					document.getElementById('data').push("</tr>");
 		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
@@ -50,20 +48,18 @@ window.addEventListener('load', function() {
 		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
-				visits[i].dates.append(date);
+				visits[i].dates.push(date);
 				add_dates();
 			}
 		}
 		if(z==0){
-			visits.append({river:riv, dates:[date]})
-			document.getElementById('riverChoice').append("
-				<option name=\"option\" value=\""+riv+"\">"+riv+"</option>
-			");
+			visits.push({river:riv, dates:[date]})
+			document.getElementById('riverChoice').push("<option name=\"option\" value=\""+riv+"\">"+riv+"</option>");
 		}
 	});
 	socket.on('newColumn', function(namey, niceName){
-		column.append(name);
-		document.getElementById('headers').append("
+		column.push(name);
+		document.getElementById('headers').push("
 			<th>"+niceName+"</th>
 		");
 		var riv = document.getElementById('data').river;
@@ -71,15 +67,13 @@ window.addEventListener('load', function() {
 		var divy = document.getElementById('data');
 		for(var i=0;i<10;i++){
 			var row = divy.children[i];
-			row.append("
-				<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>
-			");
+			row.push("<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>");
 		}
 		soccket.emit('getdata', dat, riv, 0);
 	});
 	socket.on('allColumns', function(list){
 		for(var i =0;i<list.length;i++){
-			column.append(list[i]);
+			column.push(list[i]);
 		}
 	});
  }, false );
@@ -123,15 +117,13 @@ function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
 	document.getElementById('dateChoice').innerHTML ="";
-	document.getElementById('dateChoice').append("
+	document.getElementById('dateChoice').push("
 		<option name=\"option\" value=\"\">---Select---</option>
 	");
 	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
 			for(var j=0; j<visits[i].dates.length;j++){
-				document.getElementById('dateChoice').append("
-					<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>
-				");
+				document.getElementById('dateChoice').push("<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>");
 				break;
 			}
 		}
