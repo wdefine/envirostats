@@ -12,17 +12,7 @@ app.engine('html', engines.hogan); // tell Express to run.html files through Hog
 app.set('views', __dirname +'/templates'); // tell Express where to find templates
 
 app.use(express.static(__dirname + '/public'));
-
-var express = require('express');
-var anyDB = require('any-db');
-var engines = require('consolidate');
-var app = express();
 var passport = require('passport');
-var db = anyDB.createConnection('sqlite3://chatroom.db');
-
-/*app.use(express.bodyParser());              // required middleware for interpreting POST
-app.engine('html', engines.hogan);          // tell Express to run .html files through Hogan
-app.set('views', __dirname + '/templates'); // tell Express where to find templates */
 
 var googleStrategy = require('passport-google-oauth').OAuth2Strategy;
   app.configure(function() {
