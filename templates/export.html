@@ -1,1 +1,78 @@
-<p>Export Page</p>
+<html>
+	<head>
+		<title>Export Data</title>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+		<script type="text/javascript" src="export.js"></script>
+		<link rel="stylesheet" href="css.css" type="text/css" />
+		</style>
+		<meta name="riverData">
+	</head>
+
+	<body id="index_body">
+		<nav>
+			<div id="buttons">
+				<h3><a href="/submit" id="home_button">Data</a></h3>
+				<h3 id="logout"><a href="/">Logout</a></h3>
+			</div>	
+			<div id="home_header">
+				<h1>Export</h1>
+			</div>
+			<div id="left_button1">
+				<button type ="submit" id="export">Download File</button>
+			</div>
+		</nav>
+
+		<h3 class="label">River: 
+				<select id="riverChoice">
+					<option value="">---Select---</option>
+				  {{#rivers}}
+						<option name="option" value="{{river}}">{{river}}</option>
+					{{/rivers}}
+				</select> 
+				Date:
+				<select id="dateChoice">
+					<option value="">---Select---</option>
+				</select>
+				<button type="button" id="riverButton">Change Data</button>
+		</h3>
+		<h3 class="label" id="since">Return Data Since:
+				<select id="dateSince">
+					<option value="">---Select---</option>
+				  {{#dates}}
+						<option name="option" value="{{date}}">{{date}}</option>
+					{{/dates}}
+				</select>
+				<button type="button" id="sinceButton">Change Data</button>
+		</h3>
+
+		<table class="left_table" id="exleft" border=".5">
+			<div id="rows">
+				<tr><td class="grid_number">Grid #1</td></tr>
+				<tr><td class="grid_number">Grid #2</td></tr>
+				<tr><td class="grid_number">Grid #3</td></tr>
+				<tr><td class="grid_number">Grid #4</td></tr>
+				<tr><td class="grid_number">Grid #5</td></tr>
+				<tr><td class="grid_number">Grid #6</td></tr>
+				<tr><td class="grid_number">Grid #7</td></tr>
+				<tr><td class="grid_number">Grid #8</td></tr>
+				<tr><td class="grid_number">Grid #9</td></tr>
+				<tr><td class="grid_number">Grid #10</td></tr>
+			</div>
+		</table>
+
+		<div id="exdata">
+			<table border=".5" id="right_table">
+				<tr id="headers">
+					<th class="river">River</th>
+					<th class="date">Date</th>
+					{{#columns}}
+						<th class="{{namey}} deletable" id="deletable_column" onclick="delete_column({{namey}})">{{niceNames}}</th>
+					{{/columns}}
+				</tr>
+			</table>
+		</div>
+		<div id="undo" onclick="undo_delete()"><p> </p></div>
+
+	</body>
+</html>
