@@ -13,6 +13,85 @@ app.set('views', __dirname +'/templates'); // tell Express where to find templat
 
 app.use(express.static(__dirname + '/public'));
 
+var express = require('express');
+var anyDB = require('any-db');
+var engines = require('consolidate');
+var app = express();
+var passport = require('passport');
+var db = anyDB.createConnection('sqlite3://chatroom.db');
+
+/*app.use(express.bodyParser());              // required middleware for interpreting POST
+app.engine('html', engines.hogan);          // tell Express to run .html files through Hogan
+app.set('views', __dirname + '/templates'); // tell Express where to find templates */
+
+var googleStrategy = require('passport-google-oauth').OAuth2Strategy;
+  app.configure(function() {
+
+    app.set('views',  './views');
+    app.set('view engine', 'jade');
+    app.use(express.favicon());
+    app.use(express.logger('dev'));
+    app.use(express.cookieParser());
+    app.use(express.bodyParser());
+    app.use(express.session({secret:'MySecret'}));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(express.methodOverride());
+    app.use(app.router);
+    app.use(express.static('./public'));
+});
+
+app.get('/auth/google', passport.authenticate('google',{scope: 'https://www.googleapis.com/auth/plus.me https://www.google.com/m8/feeds https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'}));
+
+app.get('/auth/google/callback', function() {
+    console.log("Trying to authenticate");
+    passport.authenticate('google', {
+        successRedirect: '/profile',
+        failureRedirect: '/fail'
+    });
+});
+
+app.get('/logout', function (req, res) {
+    req.logOut();
+    res.redirect('/');
+});
+
+app.get('/profile', function (req, res) {
+    res.redirect('/submit');
+    console.log("PROFILE PAGE");
+});
+
+app.get('/fail', function (req, res) {
+    console.log("FAIL PAGE");
+    res.redirect('/');
+});
+
+/* Passport stuff */
+
+passport.use(new googleStrategy({
+        clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
+        clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
+
+        callbackURL: "http://localhost:8080/auth/google/callback"
+    },
+
+    function (accessToken, refreshToken, profile, done) {
+        console.log("STRATEGY");
+        console.log(profile); //profile contains all the personal data returned 
+        done(null, profile);
+    }
+));
+
+passport.serializeUser(function(user, callback){
+    console.log('serializing user.');
+    callback(null, user.id);
+});
+
+passport.deserializeUser(function(user, callback){
+   console.log('deserialize user.');
+   callback(null, user.id);
+});
+
 
 io.on('connection', function(socket) {
 	socket.on('submitStarter', function(){
@@ -167,10 +246,12 @@ app.get('/submit', function(request, response){
 	.on('end', function(){
 		var date;
 		var river;
-		conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])//not sure if this recent thing works
+		conn.query('SELECT * FROM stats WHERE date >= ($1)',[recent])
 		.on('data', function(row){
-			var date = getRealDate(row.date);
-			var river = row.river; //there is an error here if you try to run it
+			if(river != row.river && date != getRealDate(row.date)){ //need to check if its already used because there are ten entries for each river+date combination
+			date = getRealDate(row.date);
+			river = row.river; 
+			}
 		})		
 		.on('end', function(){
 			var rivers = [];
@@ -182,7 +263,6 @@ app.get('/submit', function(request, response){
 				column = [];
 				conn.query('SELECT * FROM columns')
 				.on('data', function(row){
-					//column.push({row.namey});
 					column.push({niceNames: row.niceNames});
 				})
 				.on('end',function(){
@@ -205,7 +285,7 @@ app.get('/export', function(request, response){
 	z.on('end', function(){
 		var q = conn.query('SELECT * FROM rivers');
 		q.on('data', function(row){
-			console.log(row.river);
+			//console.log(row.river);
 			riverList.push({river:row.river});
 		});
 		q.on('end', function(){
@@ -224,6 +304,7 @@ app.get('/export', function(request, response){
 function getSpecData(db,callback){
 	var data = [];
 	db.on('data', function (row){
+		console.log(row);
 		row.date = getRealDate(row.date);
 		data.push(row);
 	})
@@ -236,6 +317,7 @@ function getSpecData(db,callback){
 function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);
+	console.log(date);
 	return date; 
 }
 

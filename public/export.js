@@ -85,11 +85,11 @@ window.addEventListener('load', function(){
 			for(var j=0;j<visits.length;j++){
 				if(visits[j].river == data[i].river){
 					x=1;
-					visits[j].dates.push(data[i].date)
+					visits[j].dates.push(data[i].date);
 				}
 			}
 			if(x==0){
-				visits.push({river:data[i].river, dates:[data[i].date]})
+				visits.push(data[i].river, [data[i].date]});
 			}		
 		}
 	});
@@ -145,14 +145,27 @@ function since_dates(){
 function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
-	document.getElementById('dateChoice').innerHTML ="";
-	document.getElementById('dateChoice').push("<option name=\"option\" value=\"\">---Select---</option>");
+	var x = document.getElementById("mySelect");
+	for(var i=0;i<x.length;i++){
+		x.remove(i);
+	}
+	var x = document.getElementById("dateChoice");
+	var option = document.createElement("option");
+	option.text = "---Select---";
+	option.name = option;
+	x.add(option);
 	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
 			for(var j=0; j<visits[i].dates.length;j++){
-				document.getElementById('dateChoice').push("<option name=\"option\" value=\""+visits[i].dates[j]+"\">"+visits[i].dates[j]+"</option>");
+				var idk = dates[j];
+				var x = document.getElementById("dateChoice");
+				var option = document.createElement("option");
+				option.text = visits[i].idk;
+				option.name = option;
+				option.value = visits[i].idk;
+				x.add(option);
+				break;
 			}
-			break;
 		}
 	}
 }

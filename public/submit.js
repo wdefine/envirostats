@@ -76,7 +76,11 @@ window.addEventListener('load', function() {
 		}
 		if(z==0){
 			visits.push({river:riv, dates:[date]})
-			$("riverChoice").append("<option name=\"option\" value=\""+riv+"\">"+riv+"</option>");
+			var x = document.getElementById("riverChoice");
+			var option = document.createElement("option");
+			option.text = riv;
+			option.name = option;
+			x.add(option);
 		}
 	});
 	socket.on('newColumn', function(namey, niceName){
@@ -133,8 +137,8 @@ function get_data(){
 }
 function new_column(){ ///////////////make niceName and shortname
 	var niceName = document.getElementById('columnName').value;
-	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');;
-	if(name != ""){
+	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');
+	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
 	}
 	document.getElementById('columnName').value = "";
@@ -142,13 +146,25 @@ function new_column(){ ///////////////make niceName and shortname
 function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
-	document.getElementById('dateChoice').innerHTML ="";
-	$("dateChoice").append("<option name=\"option\" value=\"\">---Select---</option>");
+	var x = document.getElementById("mySelect");
+	for(var i=0;i<x.length;i++){
+		x.remove(i);
+	}
+	var x = document.getElementById("dateChoice");
+	var option = document.createElement("option");
+	option.text = "---Select---";
+	option.name = option;
+	x.add(option);
 	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
 			for(var j=0; j<visits[i].dates.length;j++){
 				var idk = dates[j];
-				$("dateChoice").append("<option name=\"option\" value=\""+visits[i].idk+"\">"+visits[i].idk+"</option>");
+				var x = document.getElementById("dateChoice");
+				var option = document.createElement("option");
+				option.text = visits[i].idk;
+				option.name = option;
+				option.value = visits[i].idk;
+				x.add(option);
 				break;
 			}
 		}
