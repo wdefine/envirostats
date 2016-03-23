@@ -24,7 +24,7 @@ var db = anyDB.createConnection('sqlite3://chatroom.db');
 app.engine('html', engines.hogan);          // tell Express to run .html files through Hogan
 app.set('views', __dirname + '/templates'); // tell Express where to find templates */
 
-var googleStrategy = require('passport-google-oauth').OAuth2Strategy;
+/*var googleStrategy = require('passport-google-oauth').OAuth2Strategy;
   app.configure(function() {
 
     app.set('views',  './views');
@@ -67,7 +67,7 @@ app.get('/fail', function (req, res) {
 });
 
 /* Passport stuff */
-
+/* 
 passport.use(new googleStrategy({
         clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
         clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
@@ -91,7 +91,7 @@ passport.deserializeUser(function(user, callback){
    console.log('deserialize user.');
    callback(null, user.id);
 });
-
+*/
 
 io.on('connection', function(socket) {
 	socket.on('submitStarter', function(){
