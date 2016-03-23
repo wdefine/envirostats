@@ -13,12 +13,12 @@
 		<nav>
 			<div id="buttons">
 				<h3><a href="/export">Export</a></h3>
-				<h3 id="logout"><a href="index.html">Logout</a></h3>
+				<h3 display="none" id="logout"><a href="/">Logout</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Envirostats Database</h1>
 			</div>
-			<div id="left_button">
+			<div id="left_button" display="none">
 				<input id="columnName" type="text" size="15" placeholder="New Column Name">
 				<button type="button" id="newColumnButton">Create</button>
 			</div>
@@ -36,7 +36,7 @@
 				<select id="riverChoice">
 						<option name="option" value="">---Select---</option>
 					{{#rivers}}
-						<option name="option" value="{{river}}">{{river}}</option>
+						<option name="option" value="{{rivernum}}">{{rivernum}}</option>
 					{{/rivers}}
 				</select>on 
 				<select id="dateChoice">
@@ -50,8 +50,8 @@
 			<table border=".5" id="right_table" river="{{metariver}}" date="{{metadate}}">
 			<tr id="headers">
 				<th>Grid #</th>
-				<th>river</th>
-				<th>date</th>
+				<th>River</th>
+				<th>Date</th>
 				{{#columns}}
 					<th>{{niceNames}}</th>
 				{{/columns}}
