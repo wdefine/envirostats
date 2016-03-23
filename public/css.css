@@ -110,25 +110,13 @@ select{
 	border-color: #4c4c53;
 }
 
-.left_table{
-	float: left;
-	color: #4c4c53;
-	font-weight: 500;
-  	margin: 60px 5px 0 10px;
-	width: 77px;
-}
-
-.left_table td{
-	padding: 5px 2px;
-	font-weight: 500;
-}
-
 #right_table{
 	padding: 0;
 	text-align: center;
 }
 #data_box{
 	text-align: center;
+	margin-left: 5%;
 	color: aliceblue;
 	width: 90%;
 	overflow: scroll;
@@ -149,20 +137,16 @@ select{
 	margin-left: 15px;
 }
 
-#exleft{
-	background-color: black;
-	margin-top: 35px;
-}
-
 #exdata{
 	overflow: scroll;
-	width: 85%;
+	width: 90%;
 	font-family: arial;
 	background-color: black;
 	color: #4c4c53;
+	margin-left: 5%;
 }
 
-th.{{namey}}.deletable:hover, #exleft td:hover{
+th#deletable_column:hover{
 	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
 	background-size: 10px 10px;
 	background-position: 95% 0;
