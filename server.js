@@ -90,13 +90,13 @@ io.on('connection', function(socket) {
 		console.log(identifier+" "+column+" "+value);
 		conn.query('UPDATE stats SET ($1) = ($2) WHERE ident = ($3)', [column, value, identifier])
 		.on('end', function() {
-			var sockets = io.sockets.clients("theRoom");
-			sockets.emit('updatedata', identifier, column, value);
+			io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
 		})
 		.on('data', function(){
 			console.log("i is an idiot");
 		})
 		.on('error', function(){
+			io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
 			console.log("someone is an idiot");
 		});
 	});
