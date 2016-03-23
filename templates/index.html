@@ -1,33 +1,22 @@
 <html> 
+
 	<head>
 		<title>EnviroStats Database</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/tdbs/jquery/2.1.3/jquery.min.js"></script>
-		<script type="text/javascript" src="index.js"></script>
+		<script type="text/javascript" src="submit.js"></script>
+		<script src="/submit.js"></script>
 		<link rel="stylesheet" href="css.css" type="text/css" />
-	
-		<meta name="riverData"/>
+		<meta name="index"/>
 	</head>
 
-	<body>
+	<body id="index_body"> 
+		<nav> 
+			<div id="home_header">
+				<h1>EnviroStats</h1>
+				<div class="g-signin2" data-onsuccess="onSignIn"></div>
+			</div>
+		</nav> 
+	</body> 
 
-		<header>
-		</header>
-		<body>
-			<div>
-				<input id="code" type="password" class="passwd" placeholder="Password">
-				<button type="button" id="passwdbtn">Sign In</button>
-			</div>
-			<div>
-				<input id="changestudent" type="password" class="passwd" placeholder="Password">
-				<button type="button" id="passwdbtn">Sign In</button>
-				<input id="changeteacher" type="password" class="passwd" placeholder="Password">
-				<button type="button" id="passwdbtn">Sign In</button>
-			</div>
-			<div>
-			 	<a href="/submit" role="button" class="indexbtn">SUBMIT DATA</a>
-			  	<a href="/export" role="button" class="indexbtn">EXPORT DATA</a>
-			</div>
-		</body>
-	</body>
 </html>
