@@ -13,7 +13,7 @@
 		<nav>
 			<div id="buttons">
 				<h3><a href="/export">Export</a></h3>
-				<h3 id="logout"><a href="/">Logout</a></h3>
+				<h3 id="logout"><a href="index.html">Logout</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Envirostats Database</h1>
@@ -46,24 +46,10 @@
 			</h3>
 		</header2>
 
-		<table class="left_table" border=".5">
-			<div id="rows">
-				<tr><td>Grid #1</td></tr>
-				<tr><td>Grid #2</td></tr>
-				<tr><td>Grid #3</td></tr>
-				<tr><td>Grid #4</td></tr>
-				<tr><td>Grid #5</td></tr>
-				<tr><td>Grid #6</td></tr>
-				<tr><td>Grid #7</td></tr>
-				<tr><td>Grid #8</td></tr>
-				<tr><td>Grid #9</td></tr>
-				<tr><td>Grid #10</td></tr>
-			</div>
-		</table>
-
 		<div id="data_box">
 			<table border=".5" id="right_table" river="{{metariver}}" date="{{metadate}}">
 			<tr id="headers">
+				<th>Grid #</th>
 				<th>River</th>
 				<th>Date</th>
 				{{#columns}}
