@@ -13,7 +13,7 @@
 		<nav>
 			<div id="buttons">
 				<h3><a href="/submit" id="home_button">Data</a></h3>
-				<h3 id="logout"><a href="/">Logout</a></h3>
+				<h3 display="none"id="logout"><a href="/">Logout</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Export</h1>
@@ -52,7 +52,7 @@
 					<th class="river">River</th>
 					<th class="date">Date</th>
 					{{#columns}}
-						<th class="{{namey}} deletable" id="deletable_column" onclick="delete_column({{namey}})">{{niceNames}}</th>
+						<th class="{{namey}}" id="deletable_column" onclick="console.log('columned');delete_column(this.class);">{{niceNames}}</th>
 					{{/columns}}
 				</tr>
 			</table>

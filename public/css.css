@@ -145,7 +145,7 @@ select{
 	color: #4c4c53;
 	margin-left: 5%;
 }
-
+/*
 th#deletable_column:hover{
 	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
 	background-size: 10px 10px;
@@ -153,6 +153,12 @@ th#deletable_column:hover{
 	background-repeat: no-repeat;
 	cursor: pointer;
 }
+td#deletable_row:hover{
+	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
+	background-size: 10px 10px;
+	background-position: 95% 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
 
 div#undo{
 	float: right;
@@ -171,7 +177,7 @@ div#undo:hover{
 	cursor: pointer;
 	background-color: #D7FDEC;
 }
-
+*/
 button{
   font-size: 12px;
   background-color: #4c4c53;

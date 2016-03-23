@@ -30,14 +30,12 @@ window.addEventListener('load', function(){
 		cell.classList.add(row);
 	});
 	socket.on('returnData', function(data){
-		console.log(data[0]);
-		console.log(data[0].river + " "+ data[0].date);
 		$("right_table").river=data[0].river;
 		$("right_table").date=data[0].date;
 		for(var i =0;i<data.length;i++){
 			var row = document.getElementById("right_table").insertRow(-1);
 			row.id = data[i].ident;
-			row.className = data[i].idennt;
+			row.className = data[i].ident;
 			var cell3 = row.insertCell(0);
 			var cell1 = row.insertCell(-1);
 			var cell2 = row.insertCell(-1);
@@ -45,27 +43,29 @@ window.addEventListener('load', function(){
 			cell1.innerHTML = data[i].river;
 			cell2.innerHTML = data[i].date;
 			cell3.innerHTML = data[i].grid_number;
-			cell1.className = "river";
-			cell2.className = "date";
-			cell3.className = "grid_number";
+			cell1.classList.add("river");
+			cell2.classList.add("date");
+			cell3.classList.add("grid_number");
 			cell1.classList.add(data[i].ident);
 			cell2.classList.add(data[i].ident);
 			cell3.classList.add(data[i].ident);
-			cell3.classList.add("deleteable");
-			cell3.onclick= function(){delete_column(data[i].ident)};
-					for(var j=0;j<column.length;j++){
-						var idk = column[j];
-						cell = row.insertCell(-1);
-						if(data[i][idk] == undefined){
-							cell.innerHTML = "";
-						}
-						else{
-							cell.innerHTML = data[i][idk];
-						}
-						cell.className = idk;
-						cell.classList.add(data[i].ident);
-
+			cell3.id= "deleteable_row";
+			cell3.name = data[i].ident;
+			cell3.onclick= function(){
+				console.log("rowclicked");
+				delete_column(this.name)};
+				for(var j=0;j<column.length;j++){
+					var idk = column[j];
+					cell = row.insertCell(-1);
+					if(data[i][idk] == undefined){
+						cell.innerHTML = "";
 					}
+					else{
+						cell.innerHTML = data[i][idk];
+					}
+					cell.classList.add(idk);
+					cell.classList.add(data[i].ident);
+				}
 		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
@@ -138,8 +138,8 @@ window.addEventListener('load', function(){
 	});
 	socket.on('allColumns', function(list){
 		for(var i =0;i<list.length;i++){
-			column.push(list[i].namey);
-			columnArray.push(list[i].namey);
+			column.push(list[i].classnames);
+			columnArray.push(list[i].classnames);
 		}
 	});
  }, false );
@@ -168,7 +168,6 @@ function since_dates(){
 
 }
 function add_dates(){
-	console.log("here");
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
 	var x = document.getElementById("dateChoice");
@@ -187,19 +186,46 @@ function add_dates(){
 				option2.name = option;
 				option2.value = visits[i].dates[j];
 				x.add(option2);
-				console.log(option2);
 			}
 			break;
 		}
 	}
 }
 function delete_column(theclass){
+	console.log("deletehere")
 	deletions.unshift(theclass);
-	document.getElementsByClassName(theclass).display = 'none';
+	var table = document.getElementById("right_table");
+	var rows =  table.rows;
+	for(var i=0;i<rows.length;i++){
+		if(rows[i].className == theclass){
+			rows[i].display = 'none'
+			console.log('huh');
+		}
+		for(var j=0;j<rows[i].cells.length;j++){
+			if (rows[i].cells[j].classList.contains(theclass)){
+				rows[i].cells[j].display = 'none'
+			}
+		}
+	}
+	//document.getElementsByClassName(theclass).display = 'none';
 }
 function undo_delete(){
-	var oldclass = deletions.pop();//this should remove item from deletions
-	document.getElementsByClassName(oldclass).display = 'block';
+	var theclass = deletions.pop();//this should remove item from deletions
+	console.log("undeletehere")
+	deletions.unshift(theclass);
+	var table = document.getElementById("right_table");
+	var rows =  table.rows;
+	for(var i=0;i<rows.length;i++){
+		if(rows[i].className == theclass){
+			rows[i].display = 'block'
+		}
+		for(var j=0;j<rows[i].cells.length;j++){
+			if (rows[i].cells[j].classList.contains(theclass)){
+				rows[i].cells[j].display = 'block'
+			}
+		}
+	}
+	//document.getElementsByClassName(oldclass).display = 'block';
 }
 function export_data(){
 	var newArray = dataArray;

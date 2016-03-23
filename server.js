@@ -13,7 +13,13 @@ app.set('views', __dirname +'/templates'); // tell Express where to find templat
 
 app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
-	socket.join("theRoom");
+	socket.roomy ="Room";
+	socket.on('signin', function(passwd){
+		socket.join("theRoom");
+		if(passwd == "i<3stats"){
+		socket.roomy ="theRoom";
+	}
+	});
 	socket.on('submitStarter', function(){
 		var recent=0;
 		conn.query('SELECT date FROM stats')
@@ -89,7 +95,7 @@ io.on('connection', function(socket) {
 		})
 		.on('data', function(){
 			console.log("i is an idiot");
-		});
+		})
 		.on('error', function(){
 			console.log("someone is an idiot");
 		});
