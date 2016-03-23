@@ -151,7 +151,7 @@ select{
 
 #exleft{
 	background-color: black;
-	margin-top: 35px;
+	margin-top: 50px;
 }
 
 #exdata{
@@ -162,7 +162,7 @@ select{
 	color: #4c4c53;
 }
 
-th.{{namey}}.deletable:hover, #exleft td:hover{
+th#deletable_column:hover, #exleft td:hover{
 	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
 	background-size: 10px 10px;
 	background-position: 95% 0;
