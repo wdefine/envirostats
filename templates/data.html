@@ -4,7 +4,7 @@
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 		<script type="text/javascript" src="submit.js"></script>
-		<link rel="stylesheet" href="css.css" type="text/css" />
+		<link rel="stylesheet" href="../public/css.css" type="text/css" />
 	
 		<meta name="riverData"/>
 	</head>
@@ -13,12 +13,12 @@
 		<nav>
 			<div id="buttons">
 				<h3><a href="/export">Export</a></h3>
-				<h3 display="none" id="logout"><a href="/">Logout</a></h3>
+				<h3 id="logout"><a href="/">Home</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Envirostats Database</h1>
 			</div>
-			<div id="left_button" display="none">
+			<div id="left_button">
 				<input id="columnName" type="text" size="15" placeholder="New Column Name">
 				<button type="button" id="newColumnButton">Create</button>
 			</div>
