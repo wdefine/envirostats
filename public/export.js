@@ -29,22 +29,41 @@ window.addEventListener('load', function(){
 
 	socket.on('updatedata', function(identifier, column, value){
 		update_data_array(identifier, column, value);
-		document.getElementById('\''+identifier+'\'').getElementById('\''+column+'\'')[0].innerHTML = value;
+		document.getElementById(identifier).getElementById(column).innerHTML = value;
 	});
 	socket.on('returnData', function(data){
+		console.log(data[0]);
+		console.log(data[0].river + " "+ data[0].date);
+		$("right_table").river=data[0].river;
+		$("right_table").date=data[0].date;
+		//$("right_table").innerHTML="";
 		for(var i =0;i<data.length;i++){
-			if(overlap(data[i].ident)==false){
-				entries += 1;
-				dataArray += data[i];
-				grid_counter+=1;
-				document.getElementById('exdata').push("<tr id=\""+data[i].ident+"\" class=\""+data[i].ident+"\"><td class=\"river\">"+data[i].river+"</td><td class=\"date\">"+data[i].date+"</td>");
-				for(var j=0;j<column.length;j++){
-					document.getElementById('exdata').push("<td class=\""+column[j]+"\">"+data[i].column[j]+"</td>");
-				}
-				document.getElementById('exdata').push("</tr>");
-				document.getElementById('rows').push("<tr class=\""+data[i].ident+" deletable\" onkeypress=\"delete_column("+data[i].ident+")\"><td>Row #"+grid_counter+"</td></tr>");
-			}
-		} 
+			var row = document.getElementById("right_table").insertRow(-1);
+			row.id = data[i].ident;
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(-1);
+			var cell3 = row.insertCell(-1);
+			//console.log(data[i].river);
+			cell1.innerHTML = data[i].river;
+			cell2.innerHTML = data[i].date;
+			cell1.className = "river";
+			cell2.className = "date";
+			cell3.innerHTML = data[i].grid_number;
+			cell3.className = "grid_number";
+					for(var j=0;j<column.length;j++){
+						var idk = column[j];
+						cell = row.insertCell(-1);
+						if(data[i].idk == undefined){
+							cell.innerHTML = "";
+						}
+						else{
+							cell.innerHTML = data[i].idk;
+						}
+						cell.className = column[j];
+						cell.onkeypress = function(){update_data(data[i].ident,column[j])}
+						cell.contentEditable = true;
+					}
+		}
 	});
 	socket.on('updateRiverDate', function(river){
 		var z=0;
@@ -76,12 +95,17 @@ window.addEventListener('load', function(){
 	});
 	socket.on('newColumn', function(name, niceName){
 		column.push(name);
-		columnArray.push(name)
-		document.getElementById('headers').push("<th class=\""+name+"  deletable\" onkeypress=\"delete_column("+name+")\">"+niceName+"</th>");
-		var divy = document.getElementById('exdata');
-		for(var i=0;i<divy.children.length;i++){
-			var row = divy.children[i];
-			row.push("<td onkeypress=\"update_data("+row.id+","+name+")\" contenteditable='true' class=\""+name+"\"></td>");
+		var myTable = document.getElementById('right_table');
+		var rows =  myTable.rows;
+		var firstRow = rows[0];
+		var cell = firstrow.insertCell(-1);
+		cell.innerHTML = niceName;
+		for(var i=1;i<rows.length;i++){//dont edit first row
+			var row = rows[i];
+			var cell = row.insertCell(-1);
+			cell.className = name;
+			cell.onkeypress = function(){update_data(row.id,column[j])}
+			cell.contentEditable = true;
 		}
 		for(var i=0;i<entries/10;i++){
 			var dat = dataArray[i*10].date;
@@ -134,10 +158,10 @@ function add_dates(){
 }
 function delete_column(theclass){
 	deletions.prepend(theclass);
-	document.getElementsByClassName('column').display = 'none';
+	document.getElementsByClassName(theclass).display = 'none';
 }
 function undo_delete(){
-	oldclass = deletions.push();//this should remove item from deletions
+	var oldclass = deletions.push();//this should remove item from deletions
 	document.getElementsByClassName(oldclass).display = 'block';
 }
 function export_data(){
