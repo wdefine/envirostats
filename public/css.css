@@ -35,6 +35,10 @@ nav div{
 	margin: 25px 0 0 7%;
 }
 
+#welcome{
+	float: left;
+	margin: 5px 0 0 7%;
+}
 #buttons{
 	float: right;
 	margin: -3px 2% 0 0;
@@ -185,4 +189,3 @@ button:hover{
   background-color: #fff;
   color: #000;
 }
-
