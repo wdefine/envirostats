@@ -27,18 +27,15 @@ window.addEventListener('load', function() {
 	socket.on('updatedata', function(identifier, column, value){
 		document.getElementById('\''+identifier+'\'').getElementsByClassName('\''+column+'\'')[0].innerHTML = value;//
 	});
-	socket.on('returnData', function(data){
-		document.getElementById('data').river=data[0].river;
-		document.getElementById('data').date=data[0].date;
-		document.getElementById('data').innerHTML="";
-		for(var i =0;i<data.length;i++){
-			document.getElementById('data').push("
-				<tr id=\""+data[i].ident+"\">
-					<td class=\"river\">"+data[i].river+"</td>
-					<td class=\"date\">"+data[i].date+"</td>
-					");
+	socket.on('returnData', function(datas){
+		console.log(datas);
+		//document.getElementById('data').river=data[0].river;
+		//document.getElementById('data').date=data[0].date;
+		//document.getElementById('data').innerHTML="";
+		for(var i =0;i<datas.length;i++){
+			document.getElementById('data').push("<tr id=\""+datas[i].ident+"\"><td class=\"river\">"+datas[i].river+"</td><td class=\"date\">"+datas[i].date+"</td>");
 					for(var j=0;j<column.length;j++){
-						document.getElementById('data').push("<td onkeypress=\"update_data("+data[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+data[i].column[j]+"</td>");
+						document.getElementById('data').push("<td onkeypress=\"update_data("+datas[i].ident+","+column[j]+")\" contenteditable='true' class=\""+column[j]+"\">"+datas[i].column[j]+"</td>");
 					}
 					document.getElementById('data').push("</tr>");
 		}
@@ -59,9 +56,7 @@ window.addEventListener('load', function() {
 	});
 	socket.on('newColumn', function(namey, niceName){
 		column.push(name);
-		document.getElementById('headers').push("
-			<th>"+niceName+"</th>
-		");
+		document.getElementById('headers').push("<th>"+niceName+"</th>");
 		var riv = document.getElementById('data').river;
 		var dat = document.getElementById('data').date;
 		var divy = document.getElementById('data');
@@ -107,8 +102,8 @@ function get_data(){
 }
 function new_column(){ ///////////////make niceName and shortname
 	var niceName = document.getElementById('columnName').value;
-	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');;
-	if(name != "" &&){
+	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');
+	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
 	}
 	document.getElementById('columnName').value = "";
@@ -117,9 +112,7 @@ function add_dates(){
 	var river = document.getElementById('riverChoice')
 	var choice = river.options[river.selectedIndex].value
 	document.getElementById('dateChoice').innerHTML ="";
-	document.getElementById('dateChoice').push("
-		<option name=\"option\" value=\"\">---Select---</option>
-	");
+	document.getElementById('dateChoice').push("<option name=\"option\" value=\"\">---Select---</option>");
 	for(var i=0;i<visits.length;i++){
 		if(visits[i].river == choice){
 			for(var j=0; j<visits[i].dates.length;j++){

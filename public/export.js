@@ -66,11 +66,11 @@ window.addEventListener('load', function(){
 			for(var j=0;j<visits.length;j++){
 				if(visits[j].river == data[i].river){
 					x=1;
-					visits[j].dates.push(data[i].date)
+					visits[j].dates.push(data[i].date);
 				}
 			}
 			if(x==0){
-				visits.push({river:data[i].river, dates:[data[i].date]})
+				visits.push(data[i].river, [data[i].date]});
 			}		
 		}
 	});
