@@ -151,8 +151,8 @@ io.on('connection', function(socket) {
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
 					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, date]);
-					socket.emit('returnData', getSpecData(special));
-					sockets.emit('updateRiverDate', river, date);
+					socket.emit('returnData', getSpecData(special, function(d) {io.sockets.emit('updateRiverDate', river, date);} ));
+					
 				}	
 			});
 
