@@ -124,7 +124,7 @@ window.addEventListener('load', function() {
  }, false );
 
 function new_event(){
-	var str = $("newDate").value;
+	var str = $("#newDate").val();
 	var d = getWeirdDate(str);
 	var river = document.getElementById('newRiver');
 	if(river != "" && str != ""){
