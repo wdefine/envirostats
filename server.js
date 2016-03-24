@@ -14,8 +14,8 @@ app.set('views', __dirname +'/templates'); // tell Express where to find templat
 app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
 	socket.roomy ="Room";
+	socket.join("theRoom");
 	socket.on('signin', function(passwd){
-		socket.join("theRoom");
 		if(passwd == "i<3stats"){
 		socket.roomy ="theRoom";
 	}
@@ -88,9 +88,10 @@ io.on('connection', function(socket) {
 	});
 	socket.on('newdata', function(identifier, column, value){
 		console.log(identifier+" "+column+" "+value);
-		conn.query('UPDATE stats SET ($1) = ($2) WHERE ident = ($3)', [column, value, identifier])
+		conn.query('UPDATE stats SET $1 = $2 WHERE ident = $3', [column, value, identifier])
 		.on('end', function() {
 			io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
+			console.log("it worked?");
 		})
 		.on('data', function(){
 			console.log("i is an idiot");
