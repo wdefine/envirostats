@@ -1,7 +1,7 @@
 <html> 
 
 	<head>
-		<title>EnviroStats Database</title>
+		<title>EnviroStats</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/tdbs/jquery/2.2.0/jquery.min.js"></script>
 		<script type="text/javascript" src="index.js"></script>
@@ -10,14 +10,10 @@
 	</head>
 
 	<body id="index_body"> 
-			<div id="home_header">
-				<h1>EnviroStats</h1>
-				<div id="index_button" display="none">
-				<input id="passwd" size="15" value=""type="password"placeholder="Password">
-				<button type="button" id="pButton">Enter</button>
+		<nav> 
 			<div id="buttons">				
 				<h3><a href="/submit">Submit</a></h3>
-				<h3><a href="/export">Export</a></h3>
+				<h3 id="logout"><a href="/export">Export</a></h3>
 			</div>
 			<div id="home_header">
 				<h1>EnviroStats</h1>
@@ -25,5 +21,13 @@
 			<div id="welcome">
 				<h3>WELCOME!</h3>
 			</div>
+		</nav>
+
+		<h3>Please Enter the Password to Continue</h3>
+
+		<div id="index_button" display="none">
+			<input id="passwd" type="text" size="25" type="password"placeholder="Password">
+			<button type="button" id="pButton">Enter</button>
+		</div>
 	</body> 
 </html>
