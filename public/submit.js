@@ -3,7 +3,6 @@ var visits = [];
 var column = [];
 window.addEventListener('load', function() {
 	socket.emit('submitStarter');
-	socket.emit('submitStarter');
 	socket.emit('getVisits');
 	document.getElementById("newRiverChoice").selectedIndex = "0";
 	document.getElementById("riverChoice").selectedIndex = "0";
@@ -35,7 +34,7 @@ window.addEventListener('load', function() {
 		}
 	});
 	socket.on('updatedata', function(row, col, val){
-		console.log("updated data "+ row + " "+ col+ " "+ val);
+		//console.log("updated data "+ row + " "+ col+ " "+ val);
 		for(var i=0;i<column.length;i++){
 			if(col == column[i]){
 				var beta= i+3;
@@ -119,7 +118,7 @@ window.addEventListener('load', function() {
 		var myTable = document.getElementById('right_table');
 		var rows =  myTable.rows;
 		var firstRow = rows[0];
-		var cell = firstrow.insertCell(-1);
+		var cell = firstRow.insertCell(-1);
 		cell.innerHTML = niceName;
 		for(var i=1;i<11;i++){
 			var row = rows[i];
@@ -208,10 +207,12 @@ function get_data(){
 }
 function new_column(){ ///////////////make niceName and shortname
 	var niceName = document.getElementById('columnName').value;
-	var str = niceName;
-	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');
+	var str = niceName.replace(/\s+/g, '').replace(/[0-9]/g, '');
+	var name = str;
+	console.log(name);
 	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
+		console.log(name, niceName);
 	}
 	document.getElementById('columnName').value = "";
 }

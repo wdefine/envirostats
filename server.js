@@ -89,7 +89,7 @@ io.on('connection', function(socket) {
 		});
 	});
 	socket.on('newdata', function(identifier, column, value){
-		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)'
+		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)';
 		conn.query(str,[value,identifier]);
 		io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
 	});
@@ -118,9 +118,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('addColumn', function(namey, niceName){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', [namey]);
-		conn.query('INSERT INTO columns (namey, niceNames) VALUES ($1,$2)',[namey, niceName]);
-		io.sockets.in("theRoom").emit('newColumn', namey, niceName);
+	
 	});
 
 	socket.on('newentries', function(date, river){
