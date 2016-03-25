@@ -13,12 +13,15 @@ app.set('views', __dirname +'/templates'); // tell Express where to find templat
 
 app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
-	socket.roomy ="Room";
 	socket.join("theRoom");
 	socket.on('signin', function(passwd){
+		console.log(passwd);
 		if(passwd == "i<3stats"){
-		socket.roomy ="theRoom";
-	}
+			socket.emit('signingood');
+		}
+		else{
+			socket.emit('signinbad');
+		}
 	});
 	socket.on('submitStarter', function(){
 		var recent=0;
@@ -118,7 +121,8 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('addColumn', function(namey, niceName){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', [namey]);
+		var str = 'ALTER TABLE stats ADD '+namey+' FLOAT';
+		conn.query(str);
 		conn.query('INSERT INTO columns (namey, niceNames) VALUES ($1,$2)',[namey, niceName]);
 		io.sockets.in("theRoom").emit('newColumn', namey, niceName);
 	});
