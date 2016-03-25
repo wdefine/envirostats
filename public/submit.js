@@ -2,7 +2,7 @@ var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
 window.addEventListener('load', function() {
-	socket.emit('submitStarter');
+	get_cookie();
 	socket.emit('submitStarter');
 	socket.emit('getVisits');
 	document.getElementById("newRiverChoice").selectedIndex = "0";
@@ -59,7 +59,7 @@ window.addEventListener('load', function() {
 		for(var i=rows.length;i>1;i--){//dont delete row 0
 			myTable.deleteRow(i-1);
 		}
-		for(var i =0;i<data.length;i++){
+		for(var i =0;i<10;i++){
 			var row = myTable.insertRow(-1);
 			row.id = data[i].ident;
 			var cell3 = row.insertCell(0);
@@ -209,9 +209,10 @@ function get_data(){
 function new_column(){ ///////////////make niceName and shortname
 	var niceName = document.getElementById('columnName').value;
 	var str = niceName;
-	var name = str = str.replace(/\s+/g, '').replace(/[0-9]/g, '');
+	var name = str = str.replace(/\s+/g, '_').replace(/[0-9]/g, '');
 	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
+		console.log(name);
 	}
 	document.getElementById('columnName').value = "";
 }
@@ -295,5 +296,11 @@ function add_days(){
 			option.value = i;
 			x.add(option);
 		}
+	}
+}
+function get_cookie(){
+	var x = document.cookie
+	if(x == "" || x != "signin=good"){
+    	window.location='http://localhost:8080/'
 	}
 }
