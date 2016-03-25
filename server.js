@@ -14,8 +14,8 @@ app.set('views', __dirname +'/templates'); // tell Express where to find templat
 app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
 	socket.roomy ="Room";
+	socket.join("theRoom");
 	socket.on('signin', function(passwd){
-		socket.join("theRoom");
 		if(passwd == "i<3stats"){
 		socket.roomy ="theRoom";
 	}
@@ -31,7 +31,7 @@ io.on('connection', function(socket) {
 		.on('end', function(){
 			var date;
 			var river;
-			conn.query('SELECT date,river FROM stats WHERE date >= ($1)',[recent])
+			conn.query('SELECT date, river FROM stats WHERE date >= ($1)',[recent])
 			.on('data', function(row){
 				date = row.date;
 				river = row.river;
@@ -82,23 +82,16 @@ io.on('connection', function(socket) {
 		.on('data', function(row){
 			data.push(row);
 		})
+		.on('error', function(){
+		})
 		.on('end', function(){
-			socket.emit('returnVisits', data)
+			socket.emit('returnVisits', data);
 		});
 	});
 	socket.on('newdata', function(identifier, column, value){
-		console.log(identifier+" "+column+" "+value);
-		conn.query('UPDATE stats SET ($1) = ($2) WHERE ident = ($3)', [column, value, identifier])
-		.on('end', function() {
-			var sockets = io.sockets.clients("theRoom");
-			sockets.emit('updatedata', identifier, column, value);
-		})
-		.on('data', function(){
-			console.log("i is an idiot");
-		})
-		.on('error', function(){
-			console.log("someone is an idiot");
-		});
+		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)'
+		conn.query(str,[value,identifier]);
+		io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
 	});
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
 		//date and river |river | date | all rivers since a certain date | all
@@ -115,7 +108,6 @@ io.on('connection', function(socket) {
 			getSpecData(c,function(data) { socket.emit('returnData', data); });
 		}
 		else if(date != 0 && river != 0 && since == 0){ //return from both river and date
-			//console.log("making sure I'm here" + date+ " "+river);
 			var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 			getSpecData(d,function(data) { socket.emit('returnData', data); });
 		}
@@ -126,33 +118,51 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('addColumn', function(namey, niceName){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', [name]);
-		//
-		//edit mustahce file
-		//
+		conn.query('ALTER TABLE stats ADD ($1) float', [namey]);
 		conn.query('INSERT INTO columns (namey, niceNames) VALUES ($1,$2)',[namey, niceName]);
-		sockets.emit('newColumn', name);
+		io.sockets.in("theRoom").emit('newColumn', namey, niceName);
 	});
 
 	socket.on('newentries', function(date, river){
 		var x =0;
+		var y=0;
 		conn.query('SELECT river, date FROM visits')
 			.on('data', function(row){
 				if(row.river == river && row.date == date){
 					x=1;
 				}
+				if(row.river == river){
+					y=1;
+				}
 			})
 			.on('end', function(){
 				if(x==0){
-					for(var i=0; i<10; i++){	
-						conn.query('INSERT INTO stats (date, river) VALUES($1,$2)',[date, river]);
+					if(y==0){
+						for(var i=0; i<10; i++){	
+							conn.query('INSERT INTO stats (date, river, grid_number) VALUES($1,$2,$3)',[date, river, i]);
+						}
+						conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
+						conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
+						conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
+						var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, date]);
+						socket.emit('returnData', getSpecData(special, function(d) {io.sockets.in("theRoom").emit('updateRiverDate', river, date);} ));
+					}
+					else{
+						conn.query('SELECT site_number FROM stats WHERE river = ($1)',[river])
+						.on('data',function(row){
+							var site = row.site_number;
+						})
+						.on('end',function(){
+							for(var i=0; i<10; i++){	
+								conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river, i,site]);
+							}
+						});
 					}
 					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
-					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, data]);
-					socket.emit('returnData', getSpecData(special));
-					sockets.emit('updateRiverDate', river, date);
+					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, date]);
+					socket.emit('returnData', getSpecData(special, function(d) {io.sockets.in("theRoom").emit('updateRiverDate', river, date);} ));
 				}	
 			});
 
@@ -208,13 +218,11 @@ app.get('/export', function(request, response){
 	var riverList = [];
 	var z = conn.query('SELECT * FROM columns');
 	z.on('data', function(row){
-		//console.log(row.niceNames);
 		headerList.push({niceNames:row.niceNames, namey:row.namey});
 	});
 	z.on('end', function(){
 		var q = conn.query('SELECT * FROM rivers');
 		q.on('data', function(row){
-			//console.log(row.river);
 			riverList.push({river:row.river});
 		});
 		q.on('end', function(){
@@ -243,7 +251,6 @@ function getSpecData(db,callback){
 function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);
-	console.log(date);
 	return date; 
 }
 
