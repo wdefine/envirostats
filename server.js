@@ -91,10 +91,10 @@ io.on('connection', function(socket) {
 			socket.emit('returnVisits', data);
 		});
 	});
-	socket.on('newdata', function(identifier, column, value){
-		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)'
+	socket.on('newdata', function(identifier, column, value, specname){
+		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)';
 		conn.query(str,[value,identifier]);
-		io.sockets.in("theRoom").emit('updatedata', identifier, column, value);
+		io.sockets.in("theRoom").emit('updatedata', identifier, column, value, specname);
 	});
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
 		//date and river |river | date | all rivers since a certain date | all
@@ -142,34 +142,34 @@ io.on('connection', function(socket) {
 			.on('end', function(){
 				if(x==0){
 					if(y==0){
-						for(var i=0; i<10; i++){	
+						for(var i=1; i<11; i++){	
 							conn.query('INSERT INTO stats (date, river, grid_number) VALUES($1,$2,$3)',[date, river, i]);
 						}
+						var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+						getSpecData(d, function(data) { socket.emit('returnData', data); });
 						conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
-						conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
-						conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
-						var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, date]);
-						socket.emit('returnData', getSpecData(special, function(d) {io.sockets.in("theRoom").emit('updateRiverDate', river, date);} ));
 					}
 					else{
+						var site;
 						conn.query('SELECT site_number FROM stats WHERE river = ($1)',[river])
 						.on('data',function(row){
-							var site = row.site_number;
+							site = row.site_number;
 						})
 						.on('end',function(){
-							for(var i=0; i<10; i++){	
-								conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river, i,site]);
+							for(var i=1; i<11; i++){
+								console.log("row inserted");	
+								conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river,i ,site]);
 							}
+							var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+							getSpecData(d, function(data) { socket.emit('returnData', data); });
 						});
 					}
-					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
+					console.log("next plz");
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
-					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, date]);
-					socket.emit('returnData', getSpecData(special, function(d) {io.sockets.in("theRoom").emit('updateRiverDate', river, date);} ));
+					io.sockets.in("theRoom").emit('updateRiverDate', river, date);
 				}	
 			});
-
 	});
 });
 
@@ -243,15 +243,30 @@ app.get('/export', function(request, response){
 });
 
 function getSpecData(db,callback){
+	console.log("almostthere");
 	var data = [];
 	db.on('data', function (row){
 		row.date = getRealDate(row.date);
 		data.push(row);
+		console.log("row added");
 	})
 	db.on('end', function(){
 		callback(data);
 	});
 }
+/*
+function newEntriesCallbackB(date, river, i, site, callback){
+	for(var i=0; i<10; i++){
+		console.log("row inserted");	
+		conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river,i ,site]);
+	}
+	var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+	getSpecData(d, function(data) { socket.emit('returnData', data); });
+}
+function newEntriesCallbackA(){
+
+}
+*/
 function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);

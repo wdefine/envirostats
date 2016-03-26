@@ -27,7 +27,7 @@ nav div{
 
 #left_button{
 	float: left;
-	margin: 25px 0 0 2%;
+	margin: 25px 0 0 7%;
 }
 
 #left_button1{
@@ -37,11 +37,12 @@ nav div{
 
 #welcome{
 	float: left;
-	margin: 5px 0 0 7%;
+	font-size: 20px;
+	margin-left: 5%;
 }
 #buttons{
 	float: right;
-	margin: -3px 2% 0 0;
+	margin: -3px 7% 0 0;
 }
 
 p{
@@ -117,6 +118,7 @@ select{
 #right_table{
 	padding: 0;
 	text-align: center;
+	max-height: 450px;
 }
 #data_box{
 	text-align: center;

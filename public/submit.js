@@ -1,8 +1,10 @@
 var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
+var specname;
 window.addEventListener('load', function() {
 	get_cookie();
+	specname = specname();
 	socket.emit('submitStarter');
 	socket.emit('getVisits');
 	document.getElementById("newRiverChoice").selectedIndex = "0";
@@ -34,20 +36,21 @@ window.addEventListener('load', function() {
 			}		
 		}
 	});
-	socket.on('updatedata', function(row, col, val){
-		console.log("updated data "+ row + " "+ col+ " "+ val);
-		for(var i=0;i<column.length;i++){
-			if(col == column[i]){
-				var beta= i+3;
-				break;
+	socket.on('updatedata', function(row, col, val, exempt){
+		if(exempt != specname){
+			for(var i=0;i<column.length;i++){
+				if(col == column[i]){
+					var beta= i+3;
+					break;
+				}
 			}
-		}
-		row = row.toString();
-		var myTable = document.getElementById('right_table');
-		var rows =  myTable.rows;
-		for(var i=0;i<rows.length;i++){
-			if(rows[i].id == row){
-				rows[i].cells[beta].innerHTML = val;
+			row = row.toString();
+			var myTable = document.getElementById('right_table');
+			var rows =  myTable.rows;
+			for(var i=0;i<rows.length;i++){
+				if(rows[i].id == row){
+					//rows[i].cells[beta].innerHTML = val;
+				}
 			}
 		}
 	});
@@ -92,7 +95,7 @@ window.addEventListener('load', function() {
 	socket.on('updateRiverDate', function(riv, date){
 		var z=0;
 		var x = document.getElementById("riverChoice");
-		var y = document.getElementById("newRiver");
+		var y = document.getElementById("newRiverChoice");
 		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
@@ -102,8 +105,6 @@ window.addEventListener('load', function() {
 		}
 		if(z==0){
 			visits.push({river:riv, dates:[date]})
-			var x = document.getElementById("riverChoice");
-			var y = document.getElementById("newRiver");
 			var option = document.createElement("option");
 			option.text = riv;
 			option.value = riv;
@@ -119,7 +120,7 @@ window.addEventListener('load', function() {
 		var myTable = document.getElementById('right_table');
 		var rows =  myTable.rows;
 		var firstRow = rows[0];
-		var cell = firstrow.insertCell(-1);
+		var cell = firstRow.insertCell(-1);
 		cell.innerHTML = niceName;
 		for(var i=1;i<11;i++){
 			var row = rows[i];
@@ -190,7 +191,7 @@ function up_data(column,row){
     	for (var i=0; i<cells.length; i++)  {
     		if(cells[i].className == column){
 				var value = cells[i].innerHTML;
-				socket.emit('newdata', row, column, value);
+				socket.emit('newdata', row, column, value, specname);
 				break;
 			}
     	}
@@ -203,7 +204,7 @@ function get_data(){
 	if(choicer != "" && choiced != ""){
 		socket.emit('getdata', choiced, choicer, 0);//since will always be 0 in submit.js
 	}
-	document.getElementById('riverChoice').getElementsByTagName('option')[0].selected = 'selected';
+	river.selectedIndex = "0";
 	add_dates();
 }
 function new_column(){ ///////////////make niceName and shortname
@@ -212,7 +213,6 @@ function new_column(){ ///////////////make niceName and shortname
 	var name = str = str.replace(/\s+/g, '_').replace(/[0-9]/g, '');
 	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
-		console.log(name);
 	}
 	document.getElementById('columnName').value = "";
 }
@@ -242,14 +242,6 @@ function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);
 	return date; 
-}
-function getWeirdDate(str){
-	var year = str.substring(0,4);
-	var month = str.substring(5,7);
-	var day = str.substring(8,10);
-	var date = new Date(year,month,day,0,0,0);
-	var d = date.getTime();
-	return d;
 }
 function selectingNewRiver(){
 	document.getElementById("newRiver").value = "";
@@ -303,4 +295,11 @@ function get_cookie(){
 	if(x == "" || x != "signin=good"){
     	window.location='http://localhost:8080/'
 	}
+}
+function specname() {
+	var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+	var result = 'BroChat-';
+	for (var i = 0; i < 8; i++)
+		result += chars.charAt(Math.floor(Math.random()*chars.length));
+	return result;
 }

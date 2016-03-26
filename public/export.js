@@ -9,96 +9,96 @@ var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function(){
 	socket.emit('exportStarter');
 	socket.emit('getVisits');
+	document.getElementById("dateSince").selectedIndex = "0";
+	document.getElementById("riverChoice").selectedIndex = "0";
+	document.getElementById("dateChoice").selectedIndex = "0";
 	document.getElementById('undo').addEventListener('click', undo_delete , false ); //for undoing deletion of row/column
 	document.getElementById('riverChoice').addEventListener('change', add_dates , false ); //for updating date options for river
 	document.getElementById('riverButton').addEventListener('click', get_data, false); //for getting data by river or river/date
 	document.getElementById('sinceButton').addEventListener('click', since_dates, false); //for searching since a date
 	document.getElementById('export').addEventListener('click', export_data , false ); //for exporting data
-
-	socket.on('updatedata', function(identifier, column, value){
-		update_data_array(identifier, column, value);
+	socket.on('updatedata', function(row, col, val, exempt){
 		for(var i=0;i<column.length;i++){
-			if(column == column[i]){
+			if(col == column[i]){
 				var beta= i+3;
 				break;
 			}
 		}
-		$(row).deleteCell(beta);
-		var cell = row.insertCell(beta);
-		cell.innerHTML=value;
-		cell.className = column;
-		cell.classList.add(row);
+		row = row.toString();
+		var myTable = document.getElementById('right_table');
+		var rows =  myTable.rows;
+		for(var i=0;i<rows.length;i++){
+			if(rows[i].id == row){
+				rows[i].cells[beta].innerHTML = val;
+			}
+		}
 	});
 	socket.on('returnData', function(data){
-		$("right_table").river=data[0].river;
-		$("right_table").date=data[0].date;
 		for(var i =0;i<data.length;i++){
-			var row = document.getElementById("right_table").insertRow(-1);
-			row.id = data[i].ident;
-			row.className = data[i].ident;
-			var cell3 = row.insertCell(0);
-			var cell1 = row.insertCell(-1);
-			var cell2 = row.insertCell(-1);
-			//console.log(data[i].river);
-			cell1.innerHTML = data[i].river;
-			cell2.innerHTML = data[i].date;
-			cell3.innerHTML = data[i].grid_number;
-			cell1.classList.add("river");
-			cell2.classList.add("date");
-			cell3.classList.add("grid_number");
-			cell1.classList.add(data[i].ident);
-			cell2.classList.add(data[i].ident);
-			cell3.classList.add(data[i].ident);
-			cell3.id= "deleteable_row";
-			cell3.name = data[i].ident;
-			cell3.onclick= function(){
-				console.log("rowclicked");
-				delete_column(this.name)};
-				for(var j=0;j<column.length;j++){
-					var idk = column[j];
-					cell = row.insertCell(-1);
-					if(data[i][idk] == undefined){
-						cell.innerHTML = "";
+			if(overlap(data[i].ident)==false){
+				var row = document.getElementById("right_table").insertRow(-1);
+				row.id = data[i].ident;
+				row.className = data[i].ident;
+				var cell3 = row.insertCell(0);
+				var cell1 = row.insertCell(-1);
+				var cell2 = row.insertCell(-1);
+				cell1.innerHTML = data[i].river;
+				cell2.innerHTML = data[i].date;
+				cell3.innerHTML = data[i].grid_number;
+				cell1.classList.add("river");
+				cell2.classList.add("date");
+				cell3.classList.add("grid_number");
+				cell1.classList.add(data[i].ident);
+				cell2.classList.add(data[i].ident);
+				cell3.classList.add(data[i].ident);
+				cell3.id= "deleteable_row";
+				cell3.name = data[i].ident;
+				cell3.onclick= function(){
+					console.log("rowclicked");
+					delete_column(this.name)};
+					for(var j=0;j<column.length;j++){
+						var idk = column[j];
+						cell = row.insertCell(-1);
+						if(data[i][idk] == undefined){
+							cell.innerHTML = "";
+						}
+						else{
+							cell.innerHTML = data[i][idk];
+							console.log(data[i][idk]);
+						}
+						cell.classList.add(idk);
+						cell.classList.add(data[i].ident);
 					}
-					else{
-						cell.innerHTML = data[i][idk];
-					}
-					cell.classList.add(idk);
-					cell.classList.add(data[i].ident);
-				}
+			}
 		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
 		var z=0;
-		var y=0;
+		var w = document.getElementById("riverChoice");
+		var x = document.getElementById("dateSince");
 		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
 				visits[i].dates.push(date);
 				add_dates();
 			}
-			for(var j=0;j<visits[i].dates.length;j++){
-				if(date == visits[i].dates[j]){
-					var y=1;
-				}
-			}
-			if(y==0){
-				var x = document.getElementById("dateSince");
-				var option = document.createElement("option");
-				option.text = getRealDate(date);
-				option.name = option;
-				option.value = date;
-			}
+			var option = document.createElement("option");
+			option.text = getRealDate(date);
+			option.name = option;
+			option.value = date;
+			x.add(option);
 		}
 		if(z==0){
 			visits.push({river:riv, dates:[date]})
-			var x = document.getElementById("riverChoice");
 			var option = document.createElement("option");
 			option.text = riv;
 			option.name = option;
 			option.value = riv;
-			x.add(option);
+			w.add(option);
 		}
+		x.selectedIndex = "0";
+		w.selectedIndex = "0";
+		add_dates();
 	});
 	socket.on('returnVisits', function(data){
 		for(var i=0;i<data.length;i++){
@@ -154,7 +154,8 @@ window.addEventListener('load', function(){
 	else if(choicer != "" && choiced == ""){
 		socket.emit('getdata', 0, choicer, 0);
 	}
-	document.getElementById('riverChoice').getElementsByTagName('option')[0].selected = 'selected';
+	river.selectedIndex = "0";
+	date.selectedIndex = "0";
 	add_dates();
 }
 function since_dates(){
@@ -164,7 +165,7 @@ function since_dates(){
 		console.log(choiced);
 		socket.emit('getdata', choiced, 0,1);
 	}
-	document.getElementById('dateSince').getElementsByTagName('option')[0].selected = 'selected';
+	date.selectedIndex = "0";
 
 }
 function add_dates(){
@@ -174,7 +175,6 @@ function add_dates(){
 	x.innerHTML="";
 	var option = document.createElement("option");
 	option.text = "---Select---";
-	option.name = option;
 	option.value = "";
 	x.add(option);
 	for(var i=0;i<visits.length;i++){
@@ -183,7 +183,6 @@ function add_dates(){
 				var idk = getRealDate(visits[i].dates[j]);
 				var option2 = document.createElement("option");
 				option2.innerHTML = idk;
-				option2.name = option;
 				option2.value = visits[i].dates[j];
 				x.add(option2);
 			}
@@ -198,12 +197,12 @@ function delete_column(theclass){
 	var rows =  table.rows;
 	for(var i=0;i<rows.length;i++){
 		if(rows[i].className == theclass){
-			rows[i].display = 'none'
+			rows[i].hide();
 			console.log('huh');
 		}
 		for(var j=0;j<rows[i].cells.length;j++){
 			if (rows[i].cells[j].classList.contains(theclass)){
-				rows[i].cells[j].display = 'none'
+				rows[i].cells[j].hide();
 			}
 		}
 	}
@@ -217,11 +216,11 @@ function undo_delete(){
 	var rows =  table.rows;
 	for(var i=0;i<rows.length;i++){
 		if(rows[i].className == theclass){
-			rows[i].display = 'block'
+			rows[i].show();
 		}
 		for(var j=0;j<rows[i].cells.length;j++){
 			if (rows[i].cells[j].classList.contains(theclass)){
-				rows[i].cells[j].display = 'block'
+				rows[i].cells[j].show();
 			}
 		}
 	}
