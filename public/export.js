@@ -68,6 +68,9 @@ window.addEventListener('load', function(){
 					}
 			}
 		}
+		for(var i=0; i<deletions.length;i++){
+			delete_column(deletions[i].theclass, deletions[i].boo);
+		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
 		var z=0;
@@ -200,15 +203,18 @@ function delete_column(theclass, boo){
 		for(var i=1;i<rows.length;i++){
 			var row = rows[i];
 			if(row.className == theclass){
-				row.hide();//not working
+				row.style.display = 'none';
 			}
 		}
 	}
 	else if(boo == false){//column
+		console.log(theclass);
+		console.log(rows.length);
 		for(var i=0;i<rows.length;i++){
 			for(var j=0;j<rows[i].cells.length;j++){
-				if(rows[i].cells[i].className == theclass){
-					cell.hide();
+				if(rows[i].cells[j].className == theclass){
+					console.log(rows[i].cells[j].className);
+					rows[i].cells[j].style.display = 'none';
 				}
 			}
 		}
@@ -227,15 +233,15 @@ function undo_delete(){
 			for(var i=1;i<rows.length;i++){
 				var row = rows[i];
 				if(row.className == theclass){
-					row.show();//not working
+					row.style.display = 'block';
 				}
 			}
 		}
 		else if(boo == false){//column
 			for(var i=0;i<rows.length;i++){
 				for(var j=0;j<rows[i].cells.length;j++){
-					if(rows[i].cells[i].className == theclass){
-						cell.show();
+					if(rows[i].cells[j].className == theclass){
+						rows[i].cells[j].style.display = 'block';
 					}
 				}
 			}
