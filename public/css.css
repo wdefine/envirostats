@@ -32,13 +32,13 @@ nav div{
 
 #left_button1{
 	float: left;
-	margin: 25px 0 0 7%;
+	margin: 25px 0 0 10%;
 }
 
 #welcome{
 	float: left;
 	font-size: 20px;
-	margin-left: 5%;
+	margin-left: 9%;
 }
 #buttons{
 	float: right;
@@ -118,7 +118,6 @@ select{
 #right_table{
 	padding: 0;
 	text-align: center;
-	max-height: 450px;
 }
 #data_box{
 	text-align: center;
@@ -162,7 +161,7 @@ th#deletable_column:hover{
 
 div#undo{
 	float: right;
-	margin-top: -36px;
+	margin-top: -45px;
 	margin-right: 1%;
 	background-color: #eee;
 	background-image:url("images/undo.png");
