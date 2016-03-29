@@ -1,3 +1,9 @@
+/*Bugs!!!!
+1. On export, hide() and show() do not work
+2. On pasting text into table, ctr + v works but right-click paste does not.
+3. cookie stays in browser for entire session. -figure out expire value
+*/
+
 var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
@@ -49,7 +55,7 @@ window.addEventListener('load', function() {
 			var rows =  myTable.rows;
 			for(var i=0;i<rows.length;i++){
 				if(rows[i].id == row){
-					//rows[i].cells[beta].innerHTML = val;
+					rows[i].cells[beta].innerHTML = val;
 				}
 			}
 		}
@@ -86,6 +92,9 @@ window.addEventListener('load', function() {
 						cell.className = column[j];
 						cell.name = data[i].ident;
 						cell.onkeyup = function(){
+							setTimeout(update_data(this.className,this.name),0);
+						};
+						cell.onpaste = function(){ //not working
 							setTimeout(update_data(this.className,this.name),0);
 						};
 						cell.contentEditable = true;
@@ -126,7 +135,10 @@ window.addEventListener('load', function() {
 			var row = rows[i];
 			var cell = row.insertCell(-1);
 			cell.className = name;
-			cell.onkeypress = function(){update_data(row.id,column[j])}
+			cell.name = row.id;
+			cell.onInput = function(){
+				setTimeout(update_data(this.className,this.name),0);
+			};
 			cell.contentEditable = true;
 		}
 		var riv = $("right_table").river;
@@ -184,18 +196,22 @@ function new_event(){
 	document.getElementById("newDay").innerHTML = "";
 }
 function update_data(column, row){
-	setTimeout(up_data(column, row), 250);
+	setTimeout(up_data(column, row), 0);
 }
 function up_data(column,row){
-		var cells=document.getElementById(row).getElementsByTagName("td");
-    	for (var i=0; i<cells.length; i++)  {
-    		if(cells[i].className == column){
-				var value = cells[i].innerHTML;
-				socket.emit('newdata', row, column, value, specname);
-				break;
+	var x=0;
+	var cells=document.getElementById(row).getElementsByTagName("td");
+    for (var i=0; i<cells.length; i++)  {
+    	if(cells[i].className == column){
+			var value = cells[i].innerHTML;
+			var ns = strip(value);
+			if(value != ns){
+				document.getElementById(row).getElementsByTagName("td")[i].innerHTML = ns;
 			}
-    	}
-	}
+			socket.emit('newdata', row, column, ns, specname);
+		}
+    }
+}
 function get_data(){
 	var river = document.getElementById('riverChoice');
 	var choicer = river.options[river.selectedIndex].value;
@@ -302,4 +318,37 @@ function specname() {
 	for (var i = 0; i < 8; i++)
 		result += chars.charAt(Math.floor(Math.random()*chars.length));
 	return result;
+}
+
+
+function strip(str){
+	str += '';
+	var rgx = /^\d|\.|-$/;
+	var out = '';
+	var newstr = false;
+	for( var i = 0; i < str.length; i++ ){
+		if(newstr == false){
+			if( rgx.test( str.charAt(i) ) ){
+				if( !( ( str.charAt(i) == '.' && out.indexOf( '.' ) != -1 ) ||
+					( str.charAt(i) == '-' && out.length != 0 ) ) ){
+					out += str.charAt(i);
+				}
+			}
+			else{
+				if(out.length != 0){
+					newstr=true;
+				}
+			}
+		}
+		else{
+			if( rgx.test( str.charAt(i) ) ){
+				if( !( ( str.charAt(i) == '.' && out.indexOf( '.' ) != -1 ) ||
+					( str.charAt(i) == '-' && out.length != 0 ) ) ){
+					out = str.charAt(i);
+				newstr=false;
+				}
+			}
+		}
+	}
+	return out;
 }

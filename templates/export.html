@@ -12,14 +12,14 @@
 	<body id="index_body">
 		<nav>
 			<div id="buttons">
-				<h3><a href="/submit" id="home_button">Data</a></h3>
+				<h3><a href="/submit" id="home_button">Submit</a></h3>
 				<h3 id="logout"><a href="/">Home</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Export</h1>
 			</div>
 			<div id="left_button1">
-				<button type ="submit" id="export">Download File</button>
+				<button type="button"id="export">Download File</button>
 			</div>
 		</nav>
 
@@ -48,11 +48,11 @@
 		<div id="exdata">
 			<table border=".5" id="right_table">
 				<tr id="headers">
-					<th class="grid_number">Grid #</th>
-					<th class="river">River</th>
-					<th class="date">Date</th>
+					<th class="grid_number"id="deletable_column"onclick="console.log('columned');delete_column(this.className, false);">Grid #</th>
+					<th class="river" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">River</th>
+					<th class="date" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">Date</th>
 					{{#columns}}
-						<th class="{{namey}}" id="deletable_column" onclick="console.log('columned');delete_column(this.class);">{{niceNames}}</th>
+						<th class="{{namey}}" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">{{niceNames}}</th>
 					{{/columns}}
 				</tr>
 			</table>

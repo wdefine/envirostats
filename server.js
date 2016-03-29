@@ -15,7 +15,6 @@ app.use(express.static(__dirname + '/public'));
 io.on('connection', function(socket) {
 	socket.join("theRoom");
 	socket.on('signin', function(passwd){
-		console.log(passwd);
 		if(passwd == "i<3stats"){
 			socket.emit('signingood');
 		}
@@ -157,14 +156,12 @@ io.on('connection', function(socket) {
 						})
 						.on('end',function(){
 							for(var i=1; i<11; i++){
-								console.log("row inserted");	
 								conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river,i ,site]);
 							}
 							var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
 							getSpecData(d, function(data) { socket.emit('returnData', data); });
 						});
 					}
-					console.log("next plz");
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
 					io.sockets.in("theRoom").emit('updateRiverDate', river, date);
@@ -243,30 +240,15 @@ app.get('/export', function(request, response){
 });
 
 function getSpecData(db,callback){
-	console.log("almostthere");
 	var data = [];
 	db.on('data', function (row){
 		row.date = getRealDate(row.date);
 		data.push(row);
-		console.log("row added");
 	})
 	db.on('end', function(){
 		callback(data);
 	});
 }
-/*
-function newEntriesCallbackB(date, river, i, site, callback){
-	for(var i=0; i<10; i++){
-		console.log("row inserted");	
-		conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river,i ,site]);
-	}
-	var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
-	getSpecData(d, function(data) { socket.emit('returnData', data); });
-}
-function newEntriesCallbackA(){
-
-}
-*/
 function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);

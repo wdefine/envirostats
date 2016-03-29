@@ -2,7 +2,6 @@ var socket = io.connect('http://localhost:8080');
 window.addEventListener('load', function() {
 	document.getElementById('pButton').addEventListener('click', code , false );
 	socket.on('signingood', function(){
-		window.alert("Sign In Successful");
 		document.getElementById('passwd').value = "";
 		var date = new Date();
 		var d = date.getTime() + 21600000;
@@ -12,6 +11,7 @@ window.addEventListener('load', function() {
 		var str = "signin=good"
 		document.cookie=str;
 		console.log(document.cookie);
+		window.location='http://localhost:8080/submit'
 	});
 	socket.on('signinbad', function(){
 		window.alert("Wrong Password. Try Again.");

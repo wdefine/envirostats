@@ -153,7 +153,7 @@ select{
 }
 
 th#deletable_column:hover{
-	background-image:url("https://openclipart.org/image/2400px/svg_to_png/154975/remove.png");
+	background-image:url("images/remove.png");
 	background-size: 10px 10px;
 	background-position: 95% 0;
 	background-repeat: no-repeat;
@@ -165,7 +165,7 @@ div#undo{
 	margin-top: -36px;
 	margin-right: 1%;
 	background-color: #eee;
-	background-image:url("https://cdn3.iconfinder.com/data/icons/gray-toolbar-4/512/undo-512.png");
+	background-image:url("images/undo.png");
 	background-size: 25px 25px;
 	background-position: 2.5px 5px;
 	background-repeat: no-repeat;
