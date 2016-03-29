@@ -52,12 +52,7 @@ window.addEventListener('load', function(){
 				cell2.name = data[i].ident;
 				cell3.name = data[i].ident;
 				cell3.onclick = function(){
-					var it = {
-						theclass: this.name,
-						boo: true
-					};
-					deletions.unshift(it);
-					delete_column(this.name, true);
+					delete_column(this.name, true, true);
 				}
 					for(var j=0;j<column.length;j++){
 						var idk = column[j];
@@ -75,7 +70,7 @@ window.addEventListener('load', function(){
 		}
 		for(var i=0;i<deletions.length;i++){
 			console.log("load delete");
-			delete_column(deletions[i].theclass, deletions[i].boo);
+			delete_column(deletions[i].theclass, deletions[i].boo, false);
 		}
 	});
 	socket.on('updateRiverDate', function(riv, date){
@@ -196,8 +191,15 @@ function add_dates(){
 		}
 	}
 }
-function delete_column(theclass, boo){
+function delete_column(theclass, boo, boo2){
 	console.log("delete");
+	if(boo2){
+		var it = {
+			theclass: theclass,
+			boo: boo
+		};
+		deletions.unshift(it);
+	}
 	var table = document.getElementById("right_table");
 	var rows =  table.rows;
 	var jqtable = $("#right_table");
