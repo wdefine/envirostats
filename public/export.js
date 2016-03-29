@@ -52,7 +52,12 @@ window.addEventListener('load', function(){
 				cell2.name = data[i].ident;
 				cell3.name = data[i].ident;
 				cell3.onclick = function(){
-					delete_column(this.name, true)
+					var it = {
+						theclass: this.name,
+						boo: true
+					};
+					deletions.unshift(it);
+					delete_column(this.name, true);
 				}
 					for(var j=0;j<column.length;j++){
 						var idk = column[j];
@@ -68,7 +73,8 @@ window.addEventListener('load', function(){
 					}
 			}
 		}
-		for(var i=0; i<deletions.length;i++){
+		for(var i=0;i<deletions.length;i++){
+			console.log("load delete");
 			delete_column(deletions[i].theclass, deletions[i].boo);
 		}
 	});
@@ -191,11 +197,7 @@ function add_dates(){
 	}
 }
 function delete_column(theclass, boo){
-	var it = {
-		theclass: theclass,
-		boo: boo
-	};
-	deletions.unshift(it);
+	console.log("delete");
 	var table = document.getElementById("right_table");
 	var rows =  table.rows;
 	var jqtable = $("#right_table");
@@ -204,23 +206,23 @@ function delete_column(theclass, boo){
 			var row = rows[i];
 			if(row.className == theclass){
 				row.style.display = 'none';
+				break;
 			}
 		}
 	}
 	else if(boo == false){//column
-		console.log(theclass);
-		console.log(rows.length);
 		for(var i=0;i<rows.length;i++){
 			for(var j=0;j<rows[i].cells.length;j++){
 				if(rows[i].cells[j].className == theclass){
-					console.log(rows[i].cells[j].className);
 					rows[i].cells[j].style.display = 'none';
+					break;
 				}
 			}
 		}
 	}
 }
 function undo_delete(){
+	console.log("undelete");
 	if(deletions[0] != undefined){
 		var theclass = deletions[0].theclass;
 		var boo = deletions[0].boo;
@@ -234,6 +236,7 @@ function undo_delete(){
 				var row = rows[i];
 				if(row.className == theclass){
 					row.style.display = 'block';
+					break;
 				}
 			}
 		}
@@ -242,6 +245,7 @@ function undo_delete(){
 				for(var j=0;j<rows[i].cells.length;j++){
 					if(rows[i].cells[j].className == theclass){
 						rows[i].cells[j].style.display = 'block';
+						break;
 					}
 				}
 			}

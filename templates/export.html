@@ -48,11 +48,11 @@
 		<div id="exdata">
 			<table border=".5" id="right_table">
 				<tr id="headers">
-					<th class="grid_number"id="deletable_column"onclick="console.log('columned');delete_column(this.className, false);">Grid #</th>
-					<th class="river" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">River</th>
-					<th class="date" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">Date</th>
+					<th class="grid_number"id="deletable_column"onclick="var it = {theclass: this.className,boo: false};deletions.unshift(this.className, false);delete_column(it);">Grid #</th>
+					<th class="river" id="deletable_column" onclick="var it = {theclass: this.className,boo: false};deletions.unshift(this.className, false);delete_column(it);">River</th>
+					<th class="date" id="deletable_column" onclick="var it = {theclass: this.className,boo: false};deletions.unshift(this.className, false);delete_column(it);">Date</th>
 					{{#columns}}
-						<th class="{{namey}}" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false);">{{niceNames}}</th>
+						<th class="{{namey}}" id="deletable_column" onclick="var it = {theclass: this.className,boo: false};deletions.unshift(this.className, false);delete_column(it);">{{niceNames}}</th>
 					{{/columns}}
 				</tr>
 			</table>
