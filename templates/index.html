@@ -3,14 +3,12 @@
 		<title>EnviroStats</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/tdbs/jquery/2.2.0/jquery.min.js"></script>
-		<script type="text/javascript" src="index.js"></script>
 		<link rel="stylesheet" href="css.css" type="text/css" />
 		<meta name="index"/>
 	</head>
 
 	<body id="index_body"> 
 		<nav> 
-			<a href="/auth/google">Signin with google</a>
 			<div id="buttons">				
 				<h3><a href="/submit">Submit</a></h3>
 				<h3 id="logout"><a href="/export">Export</a></h3>
@@ -23,10 +21,10 @@
 			</div>
 		</nav>
 
-		<h3>Please Use Your STAB Google Account to Submit Data</h3>
+		<h3>Please Use Your STAB Google Account to Login</h3>
 
 		<div id="index_button" display="none">
-			<div id="pButton"></div>
+			<a href="/auth/google"><div id="pButton" ></div></a>
 		</div>
 	</body> 
 </html>
