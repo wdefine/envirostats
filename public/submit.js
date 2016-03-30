@@ -1,9 +1,12 @@
 /*Bugs!!!!
-1. On export, hide() and show() do not work
+1. line 249
 2. On pasting text into table, ctr + v works but right-click paste does not.
 3. cookie stays in browser for entire session. -figure out expire value
 */
-
+/*potential hacks
+1. create column with same name
+2. non-data in data fields
+*/
 var socket = io.connect('http://localhost:8080');
 var visits = [];
 var column = [];
@@ -55,14 +58,13 @@ window.addEventListener('load', function() {
 			var rows =  myTable.rows;
 			for(var i=0;i<rows.length;i++){
 				if(rows[i].id == row){
+					console.log(val);
 					rows[i].cells[beta].innerHTML = val;
 				}
 			}
 		}
 	});
 	socket.on('returnData', function(data){
-		$("right_table").river=data[0].river;
-		$("right_table").date=data[0].date;
 		var myTable = document.getElementById('right_table');
 		var rows =  myTable.rows;
 		for(var i=rows.length;i>1;i--){//dont delete row 0
@@ -139,11 +141,8 @@ window.addEventListener('load', function() {
 			cell.onInput = function(){
 				setTimeout(update_data(this.className,this.name),0);
 			};
-			cell.contentEditable = true;
+		cell.contentEditable = true;
 		}
-		var riv = $("right_table").river;
-		var dat = $("right_table").date;
-		socket.emit('getdata', dat, riv, 0);
 	});
 	socket.on('allColumns', function(list){
 		for(var i =0;i<list.length;i++){
@@ -164,7 +163,8 @@ function new_event(){
 		var yr = document.getElementById('newRiverChoice');
 		var y = yr.options[yr.selectedIndex].value;
 		var river = document.getElementById('newRiver').value;
-		var d = new Date(year, month, day, 0,0,0);
+		console.log(month);
+		var d = new Date(year, month-1, day, 0,0,0);
 		var n = d.getTime();
 		if(month == 2 && day == 29){ //leap years accounted for
 			safe = false;
@@ -227,7 +227,18 @@ function new_column(){ ///////////////make niceName and shortname
 	var niceName = document.getElementById('columnName').value;
 	var str = niceName;
 	var name = str = str.replace(/\s+/g, '_').replace(/[0-9]/g, '');
-	if(name != ""){ //used to be an && in this find out what was suppsed to be there/why it was there
+	var boo3 = true;
+		for(var i=0;i<column.length;i++){
+			if(name == column[i]){
+				boo3 =false;
+				console.log(boo3);
+				break;
+			}
+		}
+		if(name == "grid_number" || name == "date" || name == "river" || name == ""){
+			boo3=false;
+		}
+	if(boo3){ //used to be an && in this find out what was suppsed to be there/why it was there
 		socket.emit('addColumn', name, niceName);
 	}
 	document.getElementById('columnName').value = "";

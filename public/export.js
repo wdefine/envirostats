@@ -28,8 +28,15 @@ window.addEventListener('load', function(){
 		var myTable = document.getElementById('right_table');
 		var rows =  myTable.rows;
 		for(var i=0;i<rows.length;i++){
-			if(rows[i].id == row){
+			if(rows[i].className == row){
+				console.log(val);
 				rows[i].cells[beta].innerHTML = val;
+			}
+		}
+		for(var j=0;j<dataArray.length;j++){
+			if(dataArray[j].ident == row){
+				console.log(val);
+				dataArray[j][col] = val;
 			}
 		}
 	});
@@ -51,6 +58,7 @@ window.addEventListener('load', function(){
 				cell1.name = data[i].ident;
 				cell2.name = data[i].ident;
 				cell3.name = data[i].ident;
+				cell3.id = "deletable_row";
 				cell3.onclick = function(){
 					delete_column(this.name, true, true);
 				}
@@ -145,6 +153,7 @@ window.addEventListener('load', function(){
 		}
 	});
  }, false );
+
  function get_data(){
  	var river = document.getElementById('riverChoice')
 	var choicer = river.options[river.selectedIndex].value
@@ -193,7 +202,7 @@ function add_dates(){
 }
 function delete_column(theclass, boo, boo2){
 	console.log("delete");
-	if(boo2){
+	if(boo2 ==true){
 		var it = {
 			theclass: theclass,
 			boo: boo
@@ -237,7 +246,7 @@ function undo_delete(){
 			for(var i=1;i<rows.length;i++){
 				var row = rows[i];
 				if(row.className == theclass){
-					row.style.display = 'block';
+					row.style.display = '';
 					break;
 				}
 			}
@@ -246,7 +255,7 @@ function undo_delete(){
 			for(var i=0;i<rows.length;i++){
 				for(var j=0;j<rows[i].cells.length;j++){
 					if(rows[i].cells[j].className == theclass){
-						rows[i].cells[j].style.display = 'block';
+						rows[i].cells[j].style.display = '';
 						break;
 					}
 				}
@@ -310,7 +319,6 @@ function export_data(){
 		document.body.appendChild(downloadLink);
 		downloadLink.click();
 		document.body.removeChild(downloadLink);
-        //window.open(encodedUri, "envirostatsdata.csv");
 }
 function overlap(ident){
 	for(var i=0;i<dataArray.length;i++){
