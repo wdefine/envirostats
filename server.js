@@ -6,22 +6,67 @@ var server = http.createServer(app); // this is new
 var io = require('socket.io').listen(server);
 var anyDB = require('any-db');
 var conn = anyDB.createConnection('sqlite3://rivers.db.sqlite');
+var passport = require('passport');
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run.html files through Hogan
 app.set('views', __dirname +'/templates'); // tell Express where to find templates
 
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.session({secret:'MySecret'}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.methodOverride());
+app.use(app.router);
 app.use(express.static(__dirname + '/public'));
+
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+// used to deserialize the user
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.use(new GoogleStrategy({
+            clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
+            clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
+            callbackURL: "http://localhost:8080/auth/google/callback"
+        },
+        function(token, refreshToken, profile, done) {
+            console.log(profile); //profile contains all the personal data returned 
+
+            if (profile._json.domain == 'stab.org' || profile._json.domain == 'students.stab.org') { 
+                done(null, profile);
+            }
+            else{
+                done(null, null);
+            }
+    })
+);
+
+app.get('/auth/google', passport.authenticate('google',{scope: 'https://www.googleapis.com/auth/plus.me https://www.google.com/m8/feeds https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'}));
+
+app.get('/auth/google/callback', function (req, res) {
+    console.log("Trying to authenticate");
+    passport.authenticate('google', {
+        successRedirect: '/submit', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
+        failureRedirect: '/auth/google'
+    })(req, res);
+});
+
+app.get('/logout', function (req, res) {
+    req.logOut();
+    res.redirect('/');
+});
+
 io.on('connection', function(socket) {
 	socket.join("theRoom");
-	socket.on('signin', function(passwd){
-		if(passwd == "i<3stats"){
-			socket.emit('signingood');
-		}
-		else{
-			socket.emit('signinbad');
-		}
-	});
 	socket.on('submitStarter', function(){
 		var recent=0;
 		conn.query('SELECT date FROM stats')
@@ -171,7 +216,7 @@ app.get('/', function(request, response){
 	response.render('index.html');
 	
 });
-app.get('/submit', function(request, response){
+app.get('/submit', ensureAuthenticated, function(request, response){
 	var recent=0;
 	conn.query('SELECT date FROM stats')
 	.on('data', function(row){
@@ -249,6 +294,15 @@ function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);
 	return date; 
+}
+
+function ensureAuthenticated(req, res, next) { //next runs the next function in the arguement line "app.get('/datapage', ensureAuthenticated, function(req, res)" would move to function(req, res)
+        if (req.user || req.isAuthenticated()) {    // is the user logged in?
+            // proceed normally
+            return next();
+        } else {                                    // user is not logged in
+            res.redirect('/auth/google');
+        }
 }
 
 server.listen(8080)

@@ -1,6 +1,4 @@
 /*Bugs!!!!
-1. line 249
-2. On pasting text into table, ctr + v works but right-click paste does not.
 3. cookie stays in browser for entire session. -figure out expire value
 */
 /*potential hacks
@@ -12,7 +10,6 @@ var visits = [];
 var column = [];
 var specname;
 window.addEventListener('load', function() {
-	get_cookie();
 	specname = specname();
 	socket.emit('submitStarter');
 	socket.emit('getVisits');
@@ -317,12 +314,6 @@ function add_days(){
 		}
 	}
 }
-function get_cookie(){
-	var x = document.cookie
-	if(x == "" || x != "signin=good"){
-    	window.location='http://localhost:8080/'
-	}
-}
 function specname() {
 	var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 	var result = 'BroChat-';
@@ -330,8 +321,6 @@ function specname() {
 		result += chars.charAt(Math.floor(Math.random()*chars.length));
 	return result;
 }
-
-
 function strip(str){
 	str += '';
 	var rgx = /^\d|\.|-$/;
