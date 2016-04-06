@@ -36,7 +36,7 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
             clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
             clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
-            callbackURL: "http://localhost:8080/auth/google/callback"
+            callbackURL: "http://localhost:8080/auth/google/callback"//problem line
         },
         function(token, refreshToken, profile, done) {
             console.log(profile); //profile contains all the personal data returned 
