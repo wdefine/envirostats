@@ -1,9 +1,6 @@
-/*Bugs!!!!
-3. cookie stays in browser for entire session. -figure out expire value
-*/
-/*potential hacks
-1. create column with same name
-2. non-data in data fields
+/*bugs
+1. new river not added to riverChoice options: it is added to newRiverChoice options
+2. Looks like shit on mobile
 */
 var socket = io.connect('http://localhost:8080');
 var visits = [];
@@ -102,8 +99,6 @@ window.addEventListener('load', function() {
 	});
 	socket.on('updateRiverDate', function(riv, date){
 		var z=0;
-		var x = document.getElementById("riverChoice");
-		var y = document.getElementById("newRiverChoice");
 		for(var i=0;i<visits.length;i++){
 			if(riv == visits[i].river){
 				z=1;
@@ -112,15 +107,16 @@ window.addEventListener('load', function() {
 			}
 		}
 		if(z==0){
+			console.log("here");
 			visits.push({river:riv, dates:[date]})
 			var option = document.createElement("option");
 			option.text = riv;
 			option.value = riv;
-			x.add(option);
-			y.add(option);
+			document.getElementById("riverChoice").add(option);
+			document.getElementById("newRiverChoice").add(option);
 		}
-		x.selectedIndex = "0";
-		y.selectedIndex = "0";
+		document.getElementById("riverChoice").selectedIndex = "0";
+		document.getElementById("newRiverChoice").selectedIndex = "0";
 		add_dates();
 	});
 	socket.on('newColumn', function(name, niceName){
@@ -135,7 +131,10 @@ window.addEventListener('load', function() {
 			var cell = row.insertCell(-1);
 			cell.className = name;
 			cell.name = row.id;
-			cell.onInput = function(){
+			cell.onkeyup = function(){
+				setTimeout(update_data(this.className,this.name),0);
+			};
+			cell.onpaste = function(){ //not working
 				setTimeout(update_data(this.className,this.name),0);
 			};
 		cell.contentEditable = true;
