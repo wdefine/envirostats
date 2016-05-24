@@ -197,16 +197,20 @@ button:hover{
   color: #000;
 }
 
+#index_button{
+	text-align: center;
+}
 #pbutton{
+	margin: auto;
 	background-image: url("images/button2.png");
 	background-position: 0 0;
 	background-size: 150px;
 	height: 85px;
 	width: 150px;
-	margin-left: 43%;
 }
 
 #pbutton:hover{
+	margin: auto;
 	cursor: pointer;
 	background-image: url("images/button.png");
 }
