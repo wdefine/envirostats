@@ -12,14 +12,14 @@
 	<body id="index_body">
 		<nav>
 			<div id="buttons">
-				<h3><a href="/submit" id="home_button">Data</a></h3>
-				<h3 id="logout"><a href="/">Logout</a></h3>
+				<h3><a href="/submit" id="home_button">Submit</a></h3>
+				<h3 id="logout"><a href="/">Home</a></h3>
 			</div>	
 			<div id="home_header">
 				<h1>Export</h1>
 			</div>
 			<div id="left_button1">
-				<button type ="submit" id="export">Download File</button>
+				<button type="button"id="export">Download File</button>
 			</div>
 		</nav>
 
@@ -40,7 +40,7 @@
 				<select id="dateSince">
 					<option value="">---Select---</option>
 				  {{#dates}}
-						<option name="option" value="{{date}}">{{date}}</option>
+						<option name="option" value="{{date}}">{{nicedate}}</option>
 					{{/dates}}
 				</select>
 				<button type="button" id="sinceButton">Change Data</button>
@@ -48,11 +48,11 @@
 		<div id="exdata">
 			<table border=".5" id="right_table">
 				<tr id="headers">
-					<th class="grid_number">Grid #</th>
-					<th class="river">River</th>
-					<th class="date">Date</th>
+					<th class="grid_number"id="deletable_column"onclick="console.log('columned');delete_column(this.className, false, true);">Grid #</th>
+					<th class="river" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false, true);">River</th>
+					<th class="date" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false, true);">Date</th>
 					{{#columns}}
-						<th class="{{namey}} deletable" id="deletable_column" onclick="delete_column({{namey}})">{{niceNames}}</th>
+						<th class="{{namey}}" id="deletable_column" onclick="console.log('columned');delete_column(this.className, false, true);">{{niceNames}}</th>
 					{{/columns}}
 				</tr>
 			</table>

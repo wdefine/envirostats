@@ -6,39 +6,58 @@ var server = http.createServer(app); // this is new
 var io = require('socket.io').listen(server);
 var anyDB = require('any-db');
 var conn = anyDB.createConnection('sqlite3://rivers.db.sqlite');
+var passport = require('passport');
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run.html files through Hogan
 app.set('views', __dirname +'/templates'); // tell Express where to find templates
 
+app.use(express.favicon());
+app.use(express.logger('dev'));
+app.use(express.cookieParser());
+app.use(express.bodyParser());
+app.use(express.session({secret:'MySecret'}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.methodOverride());
+app.use(app.router);
 app.use(express.static(__dirname + '/public'));
-var passport = require('passport');
 
-var googleStrategy = require('passport-google-oauth').OAuth2Strategy;
-  app.configure(function() {
-
-    app.set('views',  './views');
-    app.set('view engine', 'jade');
-    app.use(express.favicon());
-    app.use(express.logger('dev'));
-    app.use(express.cookieParser());
-    app.use(express.bodyParser());
-    app.use(express.session({secret:'MySecret'}));
-    app.use(passport.initialize());
-    app.use(passport.session());
-    app.use(express.methodOverride());
-    app.use(app.router);
-    app.use(express.static('./public'));
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
 });
+
+// used to deserialize the user
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.use(new GoogleStrategy({
+            clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
+            clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
+            callbackURL: "http://localhost:8080/auth/google/callback"//problem line
+        },
+        function(token, refreshToken, profile, done) {
+            console.log(profile); //profile contains all the personal data returned 
+
+            if (profile._json.domain == 'stab.org' || profile._json.domain == 'students.stab.org') { 
+                done(null, profile);
+            }
+            else{
+                done(null, null);
+            }
+    })
+);
 
 app.get('/auth/google', passport.authenticate('google',{scope: 'https://www.googleapis.com/auth/plus.me https://www.google.com/m8/feeds https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'}));
 
-app.get('/auth/google/callback', function() {
+app.get('/auth/google/callback', function (req, res) {
     console.log("Trying to authenticate");
     passport.authenticate('google', {
-        successRedirect: '/profile',
-        failureRedirect: '/fail'
-    });
+        successRedirect: '/submit', /* TODO: This is the name of the page you would like the user to go to once they are signed in */
+        failureRedirect: '/auth/google'
+    })(req, res);
 });
 
 app.get('/logout', function (req, res) {
@@ -46,44 +65,8 @@ app.get('/logout', function (req, res) {
     res.redirect('/');
 });
 
-app.get('/profile', function (req, res) {
-    res.redirect('/submit');
-    console.log("PROFILE PAGE");
-});
-
-app.get('/fail', function (req, res) {
-    console.log("FAIL PAGE");
-    res.redirect('/');
-});
-
-/* Passport stuff */
-
-passport.use(new googleStrategy({
-        clientID: '151185493239-abvb78jd1o7iemphu6o5qm8sd7s8jnri.apps.googleusercontent.com',
-        clientSecret: 'jGwAUsoOAujL9jmQMOAGuiyI',
-
-        callbackURL: "http://localhost:8080/auth/google/callback"
-    },
-
-    function (accessToken, refreshToken, profile, done) {
-        console.log("STRATEGY");
-        console.log(profile); //profile contains all the personal data returned 
-        done(null, profile);
-    }
-));
-
-passport.serializeUser(function(user, callback){
-    console.log('serializing user.');
-    callback(null, user.id);
-});
-
-passport.deserializeUser(function(user, callback){
-   console.log('deserialize user.');
-   callback(null, user.id);
-});
-
-
 io.on('connection', function(socket) {
+	socket.join("theRoom");
 	socket.on('submitStarter', function(){
 		var recent=0;
 		conn.query('SELECT date FROM stats')
@@ -93,27 +76,22 @@ io.on('connection', function(socket) {
 			}
 		})
 		.on('end', function(){
-			console.log("step 2");
 			var date;
 			var river;
-			conn.query('SELECT date,river FROM stats WHERE date >= ($1)',[recent])
+			conn.query('SELECT date, river FROM stats WHERE date >= ($1)',[recent])
 			.on('data', function(row){
 				date = row.date;
 				river = row.river;
 			})		
 			.on('end', function(){
-				console.log("the river is:"+river + " The date is:" + date);
-				console.log("step 3");
 				column = [];
 				conn.query('SELECT * FROM columns')
 				.on('data', function(row){
 					column.push(row.namey);
 				})
 				.on('end',function(){
-					console.log("step 4");
 					socket.emit('allColumns', column);
 					var g = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
-					console.log("the river is:"+river + " The date is:" + date);
 					var data = getSpecData(g,function(data) { socket.emit('returnData', data); });
 				});
 			});
@@ -125,20 +103,19 @@ io.on('connection', function(socket) {
 		var riverList = [];
 		var z = conn.query('SELECT * FROM columns');
 		z.on('data', function(row){
-			//console.log(row.niceNames);
 			headerList.push({type:row.niceNames, classnames:row.namey});
 		});
 		z.on('end', function(){
 			var q = conn.query('SELECT * FROM rivers');
 			q.on('data', function(row){
-				//console.log(row.river);
 				riverList.push({river:row.river});
 			});
 			q.on('end', function(){
 				var dates =[];
 				conn.query('SELECT * FROM dates')
 				.on('data',function(row){
-					dates.push(row);
+					row.date = getRealDate(row.date);
+					dates.push({date:row.date});
 				})
 				.on('end', function(){
 					socket.emit('allColumns', headerList);
@@ -152,15 +129,16 @@ io.on('connection', function(socket) {
 		.on('data', function(row){
 			data.push(row);
 		})
+		.on('error', function(){
+		})
 		.on('end', function(){
-			socket.emit('returnVisits', data)
+			socket.emit('returnVisits', data);
 		});
 	});
-	socket.on('newdata', function(identifier, column, value){
-		conn.query('UPDATE stats SET ($2)=($3) WHERE ident=($1)', [identifier, column, value])
-		.on("end", function() {
-			sockets.emit('updatedata', identifier, column, value);
-		});
+	socket.on('newdata', function(identifier, column, value, specname){
+		var str = 'UPDATE "main"."stats" SET ' + column +  '= ($1) WHERE  "ident" = ($2)';
+		conn.query(str,[value,identifier]);
+		io.sockets.in("theRoom").emit('updatedata', identifier, column, value, specname);
 	});
 	socket.on('getdata', function(date, river, since){ //needs river, date, 
 		//date and river |river | date | all rivers since a certain date | all
@@ -168,10 +146,6 @@ io.on('connection', function(socket) {
 			var a = conn.query('SELECT * FROM stats');
 			getSpecData(a,function(data) { socket.emit('returnData', data); });
 		}
-		/*else if(date != 0 && river == 0 && since == 0){ //return from date
-			var b = conn.query('SELECT * FROM stats WHERE date = ($1)', [date]);
-			socket.emit('returnData', getSpecData(b));
-		}*/
 		else if(date == 0 && river != 0 && since == 0){ //return from river
 			var c = conn.query('SELECT * FROM stats WHERE river = ($1)', [river]);
 			getSpecData(c,function(data) { socket.emit('returnData', data); });
@@ -187,36 +161,53 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('addColumn', function(namey, niceName){ //adds comlumn with new data type, takes in column name 
-		conn.query('ALTER TABLE stats ADD ($1) float', [name]);
-		//
-		//edit mustahce file
-		//
+		var str = 'ALTER TABLE stats ADD '+namey+' FLOAT';
+		conn.query(str);
 		conn.query('INSERT INTO columns (namey, niceNames) VALUES ($1,$2)',[namey, niceName]);
-		sockets.emit('newColumn', name);
+		io.sockets.in("theRoom").emit('newColumn', namey, niceName);
 	});
 
 	socket.on('newentries', function(date, river){
 		var x =0;
+		var y=0;
 		conn.query('SELECT river, date FROM visits')
 			.on('data', function(row){
 				if(row.river == river && row.date == date){
 					x=1;
 				}
+				if(row.river == river){
+					y=1;
+				}
 			})
 			.on('end', function(){
 				if(x==0){
-					for(var i=0; i<10; i++){	
-						conn.query('INSERT INTO stats (date, river) VALUES($1,$2)',[date, river]);
+					if(y==0){
+						for(var i=1; i<11; i++){	
+							conn.query('INSERT INTO stats (date, river, grid_number) VALUES($1,$2,$3)',[date, river, i]);
+						}
+						var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+						getSpecData(d, function(data) { socket.emit('returnData', data); });
+						conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
 					}
-					conn.query('INSERT INTO rivers (river) VALUES ($1)', [river]);
+					else{
+						var site;
+						conn.query('SELECT site_number FROM stats WHERE river = ($1)',[river])
+						.on('data',function(row){
+							site = row.site_number;
+						})
+						.on('end',function(){
+							for(var i=1; i<11; i++){
+								conn.query('INSERT INTO stats (date, river, grid_number,site_number) VALUES($1,$2,$3,$4)',[date, river,i ,site]);
+							}
+							var d = conn.query('SELECT * FROM stats WHERE river = ($1) AND date = ($2)', [river, date]);
+							getSpecData(d, function(data) { socket.emit('returnData', data); });
+						});
+					}
 					conn.query('INSERT INTO dates (date) VALUES ($1)', [date]);
 					conn.query('INSERT INTO visits (river, date) VALUES ($1, $2)', [river,date]);
-					var special = conn.query('SELECT * FROM stats WHERE river =($1) AND date = ($2)', [river, data]);
-					socket.emit('returnData', getSpecData(special));
-					sockets.emit('updateRiverDate', river, date);
+					io.sockets.in("theRoom").emit('updateRiverDate', river, date);
 				}	
 			});
-
 	});
 });
 
@@ -225,7 +216,7 @@ app.get('/', function(request, response){
 	response.render('index.html');
 	
 });
-app.get('/submit', function(request, response){
+app.get('/submit', ensureAuthenticated, function(request, response){
 	var recent=0;
 	conn.query('SELECT date FROM stats')
 	.on('data', function(row){
@@ -269,20 +260,18 @@ app.get('/export', function(request, response){
 	var riverList = [];
 	var z = conn.query('SELECT * FROM columns');
 	z.on('data', function(row){
-		//console.log(row.niceNames);
 		headerList.push({niceNames:row.niceNames, namey:row.namey});
 	});
 	z.on('end', function(){
 		var q = conn.query('SELECT * FROM rivers');
 		q.on('data', function(row){
-			//console.log(row.river);
 			riverList.push({river:row.river});
 		});
 		q.on('end', function(){
 			var dates =[];
 			conn.query('SELECT * FROM dates')
 			.on('data',function(row){
-				dates.push({date:row.date});
+				dates.push({date:row.date, nicedate:getRealDate(row.date)});
 			})
 			.on('end', function(){
 				response.render('export.html', {columns: headerList, rivers: riverList, dates:dates});
@@ -294,21 +283,26 @@ app.get('/export', function(request, response){
 function getSpecData(db,callback){
 	var data = [];
 	db.on('data', function (row){
-		console.log(row);
 		row.date = getRealDate(row.date);
 		data.push(row);
 	})
 	db.on('end', function(){
-		console.log(data);
-		//return data;
 		callback(data);
 	});
 }
 function getRealDate(number){
 	var d = new Date(number);
 	var date = d.toJSON().substring(0,10);
-	console.log(date);
 	return date; 
+}
+
+function ensureAuthenticated(req, res, next) { //next runs the next function in the arguement line "app.get('/datapage', ensureAuthenticated, function(req, res)" would move to function(req, res)
+        if (req.user || req.isAuthenticated()) {    // is the user logged in?
+            // proceed normally
+            return next();
+        } else {                                    // user is not logged in
+            res.redirect('/auth/google');
+        }
 }
 
 server.listen(8080)

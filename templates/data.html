@@ -13,10 +13,10 @@
 		<nav>
 			<div id="buttons">
 				<h3><a href="/export">Export</a></h3>
-				<h3 id="logout"><a href="/">Logout</a></h3>
+				<h3 id="logout"><a href="/">Home</a></h3>
 			</div>	
 			<div id="home_header">
-				<h1>Envirostats Database</h1>
+				<h1>Database</h1>
 			</div>
 			<div id="left_button">
 				<input id="columnName" type="text" size="15" placeholder="New Column Name">
@@ -25,29 +25,55 @@
 		</nav>
 
 		<div id="newEntries">
-			<!-- when this button is pushed, a new row is added to the table which can be edited with all the data later -->
-			<input id="newRiver" type="text" name="river" size="15" placeholder="River Name">
-			<input id="newDate" type="date" name="date" size="10" placeholder="Date">
-			<button type="button" id="newEntriesButton">Add New Data</button>
+			<h3>River
+			<input type="text" id="newRiver" name="theinput" placeholder="RiverName" value="" > or
+			<select id="newRiverChoice" name="thelist">
+				<option value="">---Select---</option>
+				{{#rivers}}
+					<option value="{{rivernum}}">{{rivernum}}</option>
+				{{/rivers}}
+			</select> 
+			On Year:
+			<input id="newYear" name="date" size="10" placeholder="YYYY" type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1'); year_edit(this.value)" />
+			Month:
+			<select id="newMonth">
+				<option value="" ></option>
+				<option value="1" >1</option>
+				<option  value="2" >2</option>
+				<option  value="3">3</option>
+				<option  value="4">4</option>
+				<option  value="5" >5</option>
+				<option value="6">6</option>
+				<option  value="7">7</option>
+				<option value="8">8</option>
+				<option  value="9" >9</option>
+				<option  value="10">10</option>
+				<option value="11">11</option>
+				<option  value="12">12</option>
+			</select>
+			Day:
+			<select id="newDay">
+			</select> 
+			<button type="button" id="newEntriesButton">Add New Data</button> </h3>
 		</div>
 		
 		<header2 id="home_header2">
 			<h3 class="label">Currently Displaying Data at
 				<select id="riverChoice">
-						<option name="option" value="">---Select---</option>
+					<option value="">---Select---</option>
 					{{#rivers}}
-						<option name="option" value="{{river}}">{{river}}</option>
+						<option value="{{rivernum}}">{{rivernum}}</option>
 					{{/rivers}}
 				</select>on 
 				<select id="dateChoice">
-						<option name="option" value="">---Select---</option>
+						<option  value="">---Select---</option>
 				</select>
 				<button type="button" id="updateButton" >Update
 			</h3>
 		</header2>
 
 		<div id="data_box">
-			<table border=".5" id="right_table" river="{{metariver}}" date="{{metadate}}">
+			<table border=".5" id="right_table">
 			<tr id="headers">
 				<th>Grid #</th>
 				<th>River</th>

@@ -46,4 +46,3 @@ conn.query('INSERT INTO columns VALUES ($1, $2)', ["soil", "Soil"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["plankton", "Plankton"]);
 conn.query('INSERT INTO columns VALUES ($1, $2)', ["fish", "Fish"]);
 
-
