@@ -1,10 +1,9 @@
 #index_body{
 	text-align: center;
-	background-image:url("images/overlay.png"), url("images/banner.jpg");
+	background-image:url("images/overlay3.png"), url("images/pix.jpg");
 	background-size: 100%;
 	margin: 0;
 	width: 100%;
-	height: 100%;
 	font-family: 'Avenir';
  	-webkit-font-smoothing: antialiased;
  	margin-top: 80px;
@@ -13,11 +12,12 @@
 nav{
 	background-color: #050505;
 	opacity: .85;
-	position: fixed;
+	position: absolute;
 	vertical-align: top;
 	width: 100%;
 	height: 70px;
 	top: 0;
+	left: 0;
 }
 
 nav div{
@@ -26,23 +26,21 @@ nav div{
 }
 
 #left_button{
-	float: left;
-	margin: 25px 0 0 7%;
+	position: absolute;
+	left: 2%;
+	margin: 25px 0 0 2%;
 }
 
 #left_button1{
-	float: left;
-	margin: 25px 0 0 10%;
+	position: absolute;
+	left: 2%;
+	margin: 25px 0 0 5%;
 }
 
-#welcome{
-	float: left;
-	font-size: 20px;
-	margin-left: 9%;
-}
 #buttons{
-	float: right;
-	margin: -3px 7% 0 0;
+	position: absolute;
+	right: 2%;
+	margin: -3px 0 0 0;
 }
 
 p{
@@ -55,11 +53,11 @@ h1{
   color: #fff;
   text-shadow: 0px 0px 10px gray;
   font-weight: 500;
-  margin: 0 0 0 15px;
+  margin: 0 5%;
 }
 
 #newEntries{
-	background-color: #4c4c53;
+	background-color: #091849;
 }
 
 #home_header2{
@@ -128,7 +126,7 @@ select{
 	margin-left: 5%;
 	color: aliceblue;
 	width: 90%;
-	max-height: 65%;
+	max-height: 75%;
 	overflow: scroll;
 }
 #row{
@@ -150,11 +148,14 @@ select{
 #exdata{
 	overflow: scroll;
 	width: 90%;
-	max-height: 75%;
+	max-height: 85%;
 	font-family: arial;
-	background-color: black;
-	color: #4c4c53;
+	background-color: #fff;
 	margin-left: 5%;
+}
+
+#exdata th, #exdata td, #exdata tr{
+	color: #050505;
 }
 
 th#deletable_column:hover, td#deletable_row:hover{
